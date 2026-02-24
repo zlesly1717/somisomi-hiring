@@ -742,10 +742,11 @@ document.getElementById('vibe-form').addEventListener('submit', async (e) => {
     data['scenario'+i+'Note'] = fd.get('scenarioNote'+i)||'';
   });
   try {
-    await fetch(CONFIG.API_URL, {
-      method:'POST', mode:'no-cors',
-      headers:{'Content-Type':'text/plain'}, body:JSON.stringify(data)
-    });
+    const params = new URLSearchParams(data);
+    // Remove 'type' since we use 'action' for GET
+    params.delete('type');
+    params.set('action', 'vibeEval');
+    await fetch(CONFIG.API_URL + '?' + params.toString());
     showToast('Evaluation submitted!');
     setTimeout(() => openProfile(currentCandidate.row), 800);
   } catch (err) {
