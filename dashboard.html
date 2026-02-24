@@ -687,6 +687,11 @@ function startVibe() {
   document.getElementById('vibe-candidate-name').textContent = 'Evaluating: ' + currentCandidate.name;
   document.getElementById('vibe-back-btn').onclick = () => openProfile(currentCandidate.row);
   gradeValues = {}; scenarioRatings = {};
+  // Reset the entire form
+  document.getElementById('vibe-form').reset();
+  // Re-enable submit button
+  const btn = document.getElementById('vibe-btn');
+  btn.disabled = false; btn.textContent = 'Submit Evaluation';
   renderScenarios(); renderGradeDots();
 }
 
