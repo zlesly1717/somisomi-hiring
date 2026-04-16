@@ -402,6 +402,14 @@ textarea { resize: vertical; min-height: 80px; }
             <label><input type="radio" name="trustClosing" value="No"> No</label>
           </div>
         </div>
+        <div class="field" style="margin-top:12px">
+          <label>If you had to have a tough conversation with this employee about not pulling their weight, how do you think they&#39;d handle it?</label>
+          <div class="radio-group">
+            <label><input type="radio" name="coachability" value="Defensive" required> 😤 Defensive</label>
+            <label><input type="radio" name="coachability" value="Would get offended"> 😟 Would get offended</label>
+            <label><input type="radio" name="coachability" value="Would take it well and want to improve"> 💪 Would take it well and want to improve</label>
+          </div>
+        </div>
         <div class="field" style="margin-top:16px">
           <label>Hire Decision *</label>
           <div class="radio-group">
@@ -458,8 +466,8 @@ let scenarioRatings = {};
 const SCENARIOS = [
   { q: "Your car breaks down and your shift starts in an hour — what do you do?", hint: "✅ Good answer: Calls/texts the store right away, finds a ride (Uber, friend, family), doesn't just no-show" },
   { q: "A customer is upset and yelling about their order being wrong — how do you handle it?", hint: "✅ Good answer: Stays calm, apologizes, remakes the order or gets a manager, doesn't argue back" },
-  { q: "It's a rush and your coworker hasn't shown up — what do you do?", hint: "✅ Good answer: Steps up, covers what they can, lets a manager know, stays positive instead of complaining" },
-  { q: "You made a mistake on a customer's order — what do you do?", hint: "✅ Good answer: Owns the mistake, apologizes, remakes it quickly, doesn't blame others" },
+  { q: "Being on time is one of our core values. You're always punctual, but this one time you're running 5 minutes late — what do you do?", hint: "✅ Good answer: Contacts the store immediately before the shift starts, gives a heads up and ETA, doesn't just show up late without saying anything, takes responsibility instead of making excuses" },
+  { q: "This team runs on equal contribution and accountability. You'll get honest feedback often, how do you handle feedback? Let's say the manager tells you to work on speed, how would you take that feedback?", hint: "✅ Good answer: Takes it positively and without defensiveness, acknowledges the feedback, has a plan to improve (e.g. asks for tips, practices, pays attention to what slows them down), doesn't make excuses or take it personally" },
   { q: "You notice your coworker is slacking off and not doing their fair share — what do you do?", hint: "✅ Good answer: Picks up the slack without drama, talks to them directly if needed, lets a manager know if it keeps happening, doesn't gossip about it to other coworkers" },
   { q: "It's 2 minutes to closing and a big family walks in — how do you greet them?", hint: "✅ Good answer: Welcomes them warmly, serves them with a good attitude, doesn't make them feel like a burden or rush them out" },
   { q: "You notice a coworker isn't wearing gloves while handling food — what do you do?", hint: "✅ Good answer: Politely reminds them, doesn't ignore it, understands food safety comes first" },
@@ -600,6 +608,7 @@ function renderProfile(c) {
       <div style="margin-top:12px">
         <div class="data-row"><span class="label">Enjoy working with?</span><span class="value">${esc(c.enjoyWorking||'—')}</span></div>
         <div class="data-row"><span class="label">Trust with closing?</span><span class="value">${esc(c.trustClosing||'—')}</span></div>
+        <div class="data-row"><span class="label">Coachability</span><span class="value">${esc(c.coachability||'—')}</span></div>
         <div class="data-row"><span class="label">Hire Decision</span><span class="value" style="font-weight:700">${esc(c.hireDecision||'—')}</span></div>
         ${c.vibeNotes?`<div class="data-row"><span class="label">Notes</span><span class="value">${esc(c.vibeNotes)}</span></div>`:''}
       </div>
@@ -739,7 +748,7 @@ document.getElementById('vibe-form').addEventListener('submit', async (e) => {
   const data = {
     type:'vibeEval', row:currentCandidate.row, pin:CONFIG.DASHBOARD_PIN,
     interviewerName:fd.get('interviewerName'), enjoyWorking:fd.get('enjoyWorking'),
-    trustClosing:fd.get('trustClosing'), hireDecision:fd.get('hireDecision'),
+    trustClosing:fd.get('trustClosing'), coachability:fd.get('coachability'), hireDecision:fd.get('hireDecision'),
     vibeNotes:fd.get('vibeNotes')||'', ...gradeValues
   };
   SCENARIOS.forEach((s,i) => {
