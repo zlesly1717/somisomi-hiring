@@ -146,9 +146,34 @@ textarea { resize: vertical; min-height: 70px; }
         </div>
       </div>
 
-      <!-- Experience -->
+      <!-- Work History -->
       <div class="card">
-        <div class="card-title"><span class="icon" style="background:var(--green-light);color:var(--green)">✅</span> Experience</div>
+        <div class="card-title"><span class="icon" style="background:var(--yellow-light);color:var(--yellow)">💼</span> Work History</div>
+
+        <div class="field">
+          <label>Most recent job — what was your title, company, and day-to-day? *</label>
+          <textarea name="recentJob" required placeholder="e.g. Shift Lead at Starbucks — opened the store, ran morning rush, trained new hires, handled cash..."></textarea>
+        </div>
+
+        <div class="field" style="margin-top:16px">
+          <label>Most recent pay in that job? *</label>
+          <input type="text" name="recentPay" required placeholder="e.g. $18/hr, or $45,000/yr salary">
+        </div>
+
+        <div class="field" style="margin-top:16px">
+          <label>Why are you leaving your current (or most recent) role? *</label>
+          <textarea name="whyLeaving" required placeholder="What's driving you to look for something new?"></textarea>
+        </div>
+
+        <div class="field" style="margin-top:16px">
+          <label>Management experience — summary of past management roles *</label>
+          <textarea name="mgmtExpSummary" required placeholder="Summarize your management background: roles, team sizes, how long, industries"></textarea>
+        </div>
+      </div>
+
+      <!-- Specific Experience -->
+      <div class="card">
+        <div class="card-title"><span class="icon" style="background:var(--green-light);color:var(--green)">✅</span> Specific Experience</div>
 
         <div class="field">
           <label>Inventory experience? *</label>
@@ -169,28 +194,6 @@ textarea { resize: vertical; min-height: 70px; }
           </div>
           <div class="reveal" id="reveal-schedulingExp">
             <textarea name="schedulingExpDesc" placeholder="Please describe (software used, team size, how long)"></textarea>
-          </div>
-        </div>
-
-        <div class="field" style="margin-top:16px">
-          <label>Staff management experience? *</label>
-          <div class="radio-group">
-            <label><input type="radio" name="staffMgmtExp" value="Yes" required> Yes</label>
-            <label><input type="radio" name="staffMgmtExp" value="No"> No</label>
-          </div>
-          <div class="reveal" id="reveal-staffMgmtExp">
-            <textarea name="staffMgmtExpDesc" placeholder="Please describe (team size, how long, industry)"></textarea>
-          </div>
-        </div>
-
-        <div class="field" style="margin-top:16px">
-          <label>Hiring / firing experience? *</label>
-          <div class="radio-group">
-            <label><input type="radio" name="hireFireExp" value="Yes" required> Yes</label>
-            <label><input type="radio" name="hireFireExp" value="No"> No</label>
-          </div>
-          <div class="reveal" id="reveal-hireFireExp">
-            <textarea name="hireFireExpDesc" placeholder="Please describe"></textarea>
           </div>
         </div>
       </div>
@@ -240,7 +243,6 @@ function showToast(msg) {
   setTimeout(() => t.classList.remove('show'), 3000);
 }
 
-// Reveal logic
 function setupReveal(name, showValues) {
   document.querySelectorAll(`input[name="${name}"]`).forEach(r => {
     r.addEventListener('change', () => {
@@ -253,10 +255,7 @@ setupReveal('collegeOrOtherJob', ['Yes']);
 setupReveal('openAvailability',  ['No', 'Partial']);
 setupReveal('inventoryExp',      ['Yes']);
 setupReveal('schedulingExp',     ['Yes']);
-setupReveal('staffMgmtExp',      ['Yes']);
-setupReveal('hireFireExp',       ['Yes']);
 
-// Submit
 document.getElementById('apply-form').addEventListener('submit', async (e) => {
   e.preventDefault();
   const btn = document.getElementById('apply-btn');
