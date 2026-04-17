@@ -1,0 +1,1040 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SomiSomi — Manager Hiring Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Fraunces:wght@600;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #FFF8F0;
+  --surface: #FFFFFF;
+  --surface-alt: #FFF1E6;
+  --border: #F0E0D0;
+  --text: #2D1B0E;
+  --text-soft: #8B7355;
+  --accent: #E8572A;
+  --accent-hover: #D04A20;
+  --accent-light: #FEF0EB;
+  --green: #2D8B46;
+  --green-light: #EDFAF1;
+  --yellow: #D4930D;
+  --yellow-light: #FFF8E7;
+  --red: #C4342A;
+  --red-light: #FEF0EF;
+  --blue: #2B6CB0;
+  --blue-light: #EBF4FF;
+  --purple: #7C3AED;
+  --purple-light: #F3EEFF;
+  --radius: 12px;
+  --shadow: 0 1px 3px rgba(45,27,14,0.06), 0 4px 12px rgba(45,27,14,0.04);
+  --shadow-lg: 0 4px 12px rgba(45,27,14,0.08), 0 12px 32px rgba(45,27,14,0.06);
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; -webkit-font-smoothing: antialiased; }
+.container { max-width: 720px; margin: 0 auto; padding: 24px 16px 80px; }
+.container.wide { max-width: 900px; }
+h1, h2, h3 { font-family: 'Fraunces', serif; }
+.page-header { text-align: center; padding: 40px 0 32px; }
+.page-header .logo { font-family: 'Fraunces', serif; font-size: 28px; font-weight: 800; color: var(--accent); }
+.page-header h1 { font-size: 22px; font-weight: 600; margin-top: 4px; }
+.page-header p { color: var(--text-soft); margin-top: 6px; font-size: 15px; }
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 24px; margin-bottom: 16px; box-shadow: var(--shadow); animation: fadeUp 0.35s ease both; }
+.card-title { font-family: 'Fraunces', serif; font-size: 17px; font-weight: 700; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+.card-title .icon { width: 28px; height: 28px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 14px; flex-shrink: 0; }
+.field { margin-bottom: 16px; }
+.field:last-child { margin-bottom: 0; }
+.field label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px; letter-spacing: 0.2px; }
+.field label .optional { font-weight: 400; color: var(--text-soft); font-size: 12px; }
+input[type="text"],input[type="password"],input[type="email"],input[type="date"],input[type="time"],select,textarea {
+  width: 100%; padding: 10px 14px; border: 1.5px solid var(--border); border-radius: 8px;
+  font-family: 'DM Sans', sans-serif; font-size: 15px; color: var(--text);
+  background: var(--surface); transition: border-color 0.2s, box-shadow 0.2s; outline: none;
+}
+input:focus, select:focus, textarea:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-light); }
+textarea { resize: vertical; min-height: 70px; }
+.radio-group { display: flex; gap: 8px; flex-wrap: wrap; }
+.radio-group label { display: flex; align-items: center; gap: 6px; font-size: 14px; font-weight: 400; cursor: pointer; padding: 8px 14px; border: 1.5px solid var(--border); border-radius: 8px; transition: all 0.2s; user-select: none; }
+.radio-group label:has(input:checked) { border-color: var(--accent); background: var(--accent-light); color: var(--accent); font-weight: 500; }
+.radio-group input { display: none; }
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 12px 24px; border: none; border-radius: 8px; font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+.btn-primary { background: var(--accent); color: #fff; width: 100%; padding: 14px; font-size: 16px; border-radius: 10px; box-shadow: 0 2px 8px rgba(232,87,42,0.25); }
+.btn-primary:hover { background: var(--accent-hover); transform: translateY(-1px); }
+.btn-primary:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+.btn-secondary { background: var(--surface); color: var(--text); border: 1.5px solid var(--border); }
+.btn-secondary:hover { background: var(--surface-alt); }
+.btn-sm { padding: 8px 16px; font-size: 13px; }
+
+.status-chip { display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 600; white-space: nowrap; }
+.status-applied { background: var(--blue-light); color: var(--blue); }
+.status-phonescreenscheduled { background: var(--purple-light); color: var(--purple); }
+.status-phonescreendone { background: var(--purple-light); color: var(--purple); }
+.status-inpersonscheduled { background: var(--yellow-light); color: var(--yellow); }
+.status-inpersondone { background: var(--yellow-light); color: var(--yellow); }
+.status-hired { background: var(--green-light); color: var(--green); }
+.status-rejected { background: var(--red-light); color: var(--red); }
+
+.toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(100px); background: var(--text); color: #fff; padding: 12px 24px; border-radius: 10px; font-size: 14px; font-weight: 500; box-shadow: var(--shadow-lg); z-index: 1000; transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); }
+.toast.show { transform: translateX(-50%) translateY(0); }
+.empty-state { text-align: center; padding: 48px 24px; color: var(--text-soft); }
+.empty-state .icon { font-size: 40px; margin-bottom: 12px; }
+.loading { display: flex; align-items: center; justify-content: center; padding: 60px; }
+.spinner { width: 32px; height: 32px; border: 3px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.7s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* Login */
+#view-login.active { display: flex; align-items: center; justify-content: center; min-height: 80vh; }
+.login-card { width: 100%; max-width: 360px; text-align: center; }
+.login-card .logo { font-family: 'Fraunces', serif; font-size: 32px; font-weight: 800; color: var(--accent); margin-bottom: 4px; }
+.login-card h2 { font-size: 18px; margin-bottom: 24px; color: var(--text-soft); font-weight: 500; font-family: 'DM Sans'; }
+.pin-input { text-align: center; font-size: 24px; letter-spacing: 8px; font-weight: 700; padding: 14px; }
+.login-error { color: var(--red); font-size: 13px; margin-top: 8px; display: none; }
+
+/* Dashboard */
+.dash-toolbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; flex-wrap: wrap; gap: 10px; }
+.dash-toolbar .left { display: flex; gap: 6px; flex-wrap: wrap; }
+.filter-btn { padding: 6px 14px; border: 1.5px solid var(--border); border-radius: 20px; background: var(--surface); font-family: 'DM Sans'; font-size: 13px; font-weight: 500; color: var(--text-soft); cursor: pointer; transition: all 0.2s; }
+.filter-btn.active { border-color: var(--accent); background: var(--accent-light); color: var(--accent); font-weight: 600; }
+.filter-btn:hover:not(.active) { border-color: #ccc; }
+.candidate-list { display: flex; flex-direction: column; gap: 10px; }
+.candidate-row { display: flex; align-items: center; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; cursor: pointer; transition: all 0.2s; box-shadow: var(--shadow); gap: 12px; animation: fadeUp 0.35s ease both; }
+.candidate-row:hover { border-color: var(--accent); box-shadow: var(--shadow-lg); transform: translateY(-1px); }
+.candidate-row .avatar { width: 42px; height: 42px; border-radius: 50%; background: var(--accent-light); color: var(--accent); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 16px; flex-shrink: 0; }
+.candidate-row .info { flex: 1; min-width: 0; }
+.candidate-row .name { font-weight: 600; font-size: 15px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.candidate-row .meta { font-size: 13px; color: var(--text-soft); margin-top: 2px; }
+.candidate-row .right { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; }
+
+/* Profile */
+.profile-back { display: inline-flex; align-items: center; gap: 6px; font-size: 14px; font-weight: 500; color: var(--text-soft); cursor: pointer; margin-bottom: 16px; padding: 6px 0; border: none; background: none; font-family: 'DM Sans'; }
+.profile-back:hover { color: var(--accent); }
+.profile-header { display: flex; align-items: center; gap: 16px; margin-bottom: 24px; }
+.profile-header .avatar { width: 56px; height: 56px; border-radius: 50%; background: var(--accent-light); color: var(--accent); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 22px; font-family: 'Fraunces', serif; flex-shrink: 0; }
+.profile-header .details h2 { font-size: 22px; font-weight: 700; }
+.profile-header .details .sub { color: var(--text-soft); font-size: 14px; margin-top: 2px; }
+.profile-actions { display: flex; gap: 8px; margin-bottom: 24px; flex-wrap: wrap; align-items: center; }
+.data-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--border); font-size: 14px; gap: 12px; }
+.data-row:last-child { border-bottom: none; }
+.data-row .label { color: var(--text-soft); flex-shrink: 0; }
+.data-row .value { font-weight: 500; text-align: right; word-break: break-word; }
+
+/* Tabs (profile) */
+.tabs { display: flex; gap: 4px; margin-bottom: 16px; border-bottom: 2px solid var(--border); }
+.tab-btn { background: none; border: none; padding: 10px 16px; font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 600; color: var(--text-soft); cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -2px; transition: all 0.2s; }
+.tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
+.tab-panel { display: none; }
+.tab-panel.active { display: block; animation: fadeUp 0.3s ease; }
+
+/* Interview (question) card */
+.question-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; margin-bottom: 12px; box-shadow: var(--shadow); animation: fadeUp 0.35s ease both; }
+.question-card .question { font-weight: 600; font-size: 15px; margin-bottom: 10px; }
+.question-card textarea { min-height: 80px; margin-bottom: 10px; }
+.rating-btns { display: flex; gap: 6px; flex-wrap: wrap; }
+.rating-btns button { padding: 8px 14px; border: 1.5px solid var(--border); border-radius: 8px; background: var(--surface); font-family: 'DM Sans'; font-size: 13px; cursor: pointer; transition: all 0.2s; }
+.rating-btns button:hover { border-color: #bbb; }
+.rating-btns button.selected { border-color: var(--accent); background: var(--accent-light); color: var(--accent); font-weight: 600; }
+
+/* Grade dots */
+.overall-grade { display: flex; flex-direction: column; gap: 12px; }
+.grade-item { display: flex; align-items: center; gap: 12px; }
+.grade-item .label { font-size: 14px; width: 150px; flex-shrink: 0; }
+.grade-dots { display: flex; gap: 4px; }
+.grade-dots button { width: 36px; height: 36px; border: 1.5px solid var(--border); border-radius: 8px; background: var(--surface); font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.15s; font-family: 'DM Sans'; color: var(--text-soft); }
+.grade-dots button:hover { border-color: #bbb; }
+.grade-dots button.selected { border-color: var(--accent); background: var(--accent); color: #fff; }
+
+/* Grade bars (readonly) */
+.vibe-score-bar { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
+.vibe-score-bar .label { font-size: 13px; color: var(--text-soft); width: 140px; flex-shrink: 0; }
+.vibe-score-bar .bar { flex: 1; height: 8px; background: var(--border); border-radius: 4px; overflow: hidden; }
+.vibe-score-bar .bar-fill { height: 100%; border-radius: 4px; transition: width 0.5s ease; }
+.vibe-score-bar .score { font-size: 13px; font-weight: 600; width: 24px; text-align: right; }
+
+/* Upcoming */
+.upcoming-panel { background: var(--blue-light); border: 1.5px solid #c3dafe; border-radius: var(--radius); padding: 20px; margin-bottom: 20px; animation: fadeUp 0.35s ease both; }
+.upcoming-panel .panel-title { font-family: 'Fraunces', serif; font-size: 16px; font-weight: 700; color: var(--blue); display: flex; align-items: center; gap: 8px; margin-bottom: 14px; }
+.upcoming-item { display: flex; align-items: center; gap: 12px; padding: 12px; background: #fff; border-radius: 10px; margin-bottom: 8px; cursor: pointer; transition: all 0.2s; border: 1px solid #e2ecf7; }
+.upcoming-item:last-child { margin-bottom: 0; }
+.upcoming-item:hover { border-color: var(--blue); box-shadow: 0 2px 8px rgba(43,108,176,0.1); }
+.upcoming-item .date-badge { background: var(--blue); color: #fff; border-radius: 10px; padding: 8px 10px; text-align: center; min-width: 52px; flex-shrink: 0; }
+.upcoming-item .date-badge.phone { background: var(--purple); }
+.upcoming-item .date-badge .month { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+.upcoming-item .date-badge .day { font-size: 20px; font-weight: 800; line-height: 1.1; font-family: 'Fraunces', serif; }
+.upcoming-item .details { flex: 1; min-width: 0; }
+.upcoming-item .details .name { font-weight: 600; font-size: 14px; }
+.upcoming-item .details .time { font-size: 13px; color: var(--text-soft); margin-top: 2px; }
+.upcoming-kind { font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 10px; text-transform: uppercase; letter-spacing: 0.5px; }
+.upcoming-kind.phone { background: var(--purple-light); color: var(--purple); }
+.upcoming-kind.inperson { background: var(--yellow-light); color: var(--yellow); }
+
+.modal-overlay { position: fixed; inset: 0; background: rgba(45,27,14,0.4); z-index: 500; display: flex; align-items: center; justify-content: center; padding: 16px; animation: fadeIn 0.2s ease; }
+.modal { background: var(--surface); border-radius: var(--radius); padding: 28px; width: 100%; max-width: 400px; box-shadow: var(--shadow-lg); animation: fadeUp 0.3s ease; }
+.modal h3 { font-family: 'Fraunces', serif; font-size: 18px; margin-bottom: 20px; display: flex; align-items: center; gap: 8px; }
+.modal .field { margin-bottom: 16px; }
+.modal .modal-actions { display: flex; gap: 8px; margin-top: 20px; }
+.modal .modal-actions .btn { flex: 1; }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+.view { display: none; }
+.view.active { display: block; }
+@keyframes fadeUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+
+@media (max-width: 600px) {
+  .profile-header { flex-direction: column; text-align: center; }
+  .dash-toolbar { flex-direction: column; align-items: stretch; }
+  .dash-toolbar .left { justify-content: center; }
+  .grade-item { flex-direction: column; align-items: flex-start; gap: 6px; }
+  .grade-item .label { width: auto; }
+}
+</style>
+</head>
+<body>
+
+<div class="toast" id="toast"></div>
+
+<!-- ═══════ LOGIN ═══════ -->
+<div id="view-login" class="view active">
+  <div class="container">
+    <div class="login-card card">
+      <div class="logo">SomiSomi</div>
+      <h2>Manager Hiring Dashboard</h2>
+      <div class="field">
+        <input type="password" class="pin-input" id="pin-input" placeholder="PIN" maxlength="10">
+      </div>
+      <div class="login-error" id="login-error">Incorrect PIN. Please try again.</div>
+      <button class="btn btn-primary" style="margin-top:16px" onclick="checkPin()">Enter</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════ DASHBOARD ═══════ -->
+<div id="view-dashboard" class="view">
+  <div class="container wide">
+    <div class="page-header" style="text-align:left; padding-bottom:20px;">
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+        <div>
+          <div class="logo" style="font-family:'Fraunces',serif; font-size:28px; font-weight:800; color:var(--accent);">SomiSomi</div>
+          <h1>Manager Hiring Dashboard</h1>
+        </div>
+        <button class="btn btn-secondary btn-sm" onclick="logoutDash()">🔒 Log Out</button>
+      </div>
+    </div>
+    <div class="dash-toolbar">
+      <div class="left">
+        <button class="filter-btn active" onclick="setFilter('all',this)">All</button>
+        <button class="filter-btn" onclick="setFilter('Applied',this)">📩 Applied</button>
+        <button class="filter-btn" onclick="setFilter('Phone Screen Scheduled',this)">📞 PS Scheduled</button>
+        <button class="filter-btn" onclick="setFilter('Phone Screen Done',this)">📞 PS Done</button>
+        <button class="filter-btn" onclick="setFilter('In-Person Scheduled',this)">🤝 IP Scheduled</button>
+        <button class="filter-btn" onclick="setFilter('In-Person Done',this)">🤝 IP Done</button>
+        <button class="filter-btn" onclick="setFilter('Hired',this)">✅ Hired</button>
+        <button class="filter-btn" onclick="setFilter('Rejected',this)">❌ Rejected</button>
+      </div>
+      <button class="btn btn-secondary btn-sm" onclick="refreshDash()">↻ Refresh</button>
+    </div>
+    <div id="upcoming-interviews"></div>
+    <div id="candidate-list" class="candidate-list"></div>
+  </div>
+</div>
+
+<!-- ═══════ PROFILE ═══════ -->
+<div id="view-profile" class="view">
+  <div class="container">
+    <button class="profile-back" onclick="showView('dashboard')">← Back to Dashboard</button>
+    <div id="profile-content"></div>
+  </div>
+</div>
+
+<!-- ═══════ PHONE SCREEN INTERVIEW ═══════ -->
+<div id="view-phonescreen" class="view">
+  <div class="container">
+    <button class="profile-back" id="ps-back-btn">← Back to Profile</button>
+    <div class="page-header" style="text-align:left; padding-top:0;">
+      <h1>📞 Phone Screen</h1>
+      <p id="ps-candidate-name"></p>
+    </div>
+    <form id="ps-form">
+      <div class="card">
+        <div class="card-title"><span class="icon" style="background:var(--accent-light);color:var(--accent)">👤</span> Interviewer</div>
+        <div class="field">
+          <label>Your Name *</label>
+          <input type="text" name="phoneScreenerName" required placeholder="Who is conducting this phone screen?">
+        </div>
+      </div>
+
+      <div id="ps-questions"></div>
+
+      <div class="card">
+        <div class="card-title"><span class="icon" style="background:var(--green-light);color:var(--green)">🎯</span> Overall</div>
+        <div class="field">
+          <label>Overall notes <span class="optional">(optional)</span></label>
+          <textarea name="ps_overallNotes" placeholder="Any additional thoughts about this phone screen"></textarea>
+        </div>
+        <div class="field" style="margin-top:12px">
+          <label>Move forward to in-person interview? *</label>
+          <div class="radio-group">
+            <label><input type="radio" name="ps_moveForward" value="Yes" required> ✅ Yes</label>
+            <label><input type="radio" name="ps_moveForward" value="Maybe"> 🤔 Maybe</label>
+            <label><input type="radio" name="ps_moveForward" value="No"> ❌ No</label>
+          </div>
+        </div>
+      </div>
+
+      <button type="submit" class="btn btn-primary" id="ps-submit-btn">Submit Phone Screen</button>
+    </form>
+  </div>
+</div>
+
+<!-- ═══════ IN-PERSON INTERVIEW ═══════ -->
+<div id="view-inperson" class="view">
+  <div class="container">
+    <button class="profile-back" id="ip-back-btn">← Back to Profile</button>
+    <div class="page-header" style="text-align:left; padding-top:0;">
+      <h1>🤝 In-Person Interview</h1>
+      <p id="ip-candidate-name"></p>
+    </div>
+    <form id="ip-form">
+      <div class="card">
+        <div class="card-title"><span class="icon" style="background:var(--accent-light);color:var(--accent)">👤</span> Interviewer</div>
+        <div class="field">
+          <label>Your Name *</label>
+          <input type="text" name="inPersonInterviewerName" required placeholder="Who is conducting this interview?">
+        </div>
+      </div>
+
+      <div id="ip-questions"></div>
+
+      <div class="card">
+        <div class="card-title"><span class="icon" style="background:var(--yellow-light);color:var(--yellow)">⭐</span> Overall Grades (0–5)</div>
+        <div class="overall-grade">
+          <div class="grade-item"><span class="label">Leadership</span><div class="grade-dots" data-grade="gradeLeadership"></div></div>
+          <div class="grade-item"><span class="label">Decision Making</span><div class="grade-dots" data-grade="gradeDecisionMaking"></div></div>
+          <div class="grade-item"><span class="label">Communication</span><div class="grade-dots" data-grade="gradeCommunication"></div></div>
+          <div class="grade-item"><span class="label">Reliability</span><div class="grade-dots" data-grade="gradeReliability"></div></div>
+          <div class="grade-item"><span class="label">Problem Solving</span><div class="grade-dots" data-grade="gradeProblemSolving"></div></div>
+          <div class="grade-item"><span class="label">Integrity</span><div class="grade-dots" data-grade="gradeIntegrity"></div></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title"><span class="icon" style="background:var(--green-light);color:var(--green)">🤝</span> Final Assessment</div>
+        <div class="field">
+          <label>Would you enjoy working with them?</label>
+          <div class="radio-group">
+            <label><input type="radio" name="enjoyWorking" value="Yes" required> Yes</label>
+            <label><input type="radio" name="enjoyWorking" value="Maybe"> Maybe</label>
+            <label><input type="radio" name="enjoyWorking" value="No"> No</label>
+          </div>
+        </div>
+        <div class="field" style="margin-top:12px">
+          <label>Would you trust them with running the store?</label>
+          <div class="radio-group">
+            <label><input type="radio" name="trustWithStore" value="Yes" required> Yes</label>
+            <label><input type="radio" name="trustWithStore" value="Maybe"> Maybe</label>
+            <label><input type="radio" name="trustWithStore" value="No"> No</label>
+          </div>
+        </div>
+        <div class="field" style="margin-top:12px">
+          <label>If you had to give tough feedback to this manager, how do you think they'd take it?</label>
+          <div class="radio-group">
+            <label><input type="radio" name="coachability" value="Defensive" required> 😤 Defensive</label>
+            <label><input type="radio" name="coachability" value="Would get offended"> 😟 Would get offended</label>
+            <label><input type="radio" name="coachability" value="Would take it well and want to improve"> 💪 Would take it well and want to improve</label>
+          </div>
+        </div>
+        <div class="field" style="margin-top:16px">
+          <label>Hire Decision *</label>
+          <div class="radio-group">
+            <label><input type="radio" name="hireDecision" value="Yes" required> ✅ Yes</label>
+            <label><input type="radio" name="hireDecision" value="Yes – with conditions"> ⚠️ Yes, with conditions</label>
+            <label><input type="radio" name="hireDecision" value="No"> ❌ No</label>
+          </div>
+        </div>
+        <div class="field" style="margin-top:12px">
+          <label>Overall notes / conditions <span class="optional">(optional)</span></label>
+          <textarea name="ip_overallNotes" placeholder="Any other thoughts"></textarea>
+        </div>
+      </div>
+
+      <button type="submit" class="btn btn-primary" id="ip-submit-btn">Submit In-Person Interview</button>
+    </form>
+  </div>
+</div>
+
+<!-- ═══════ SCHEDULE MODALS ═══════ -->
+<div id="schedule-ps-modal" class="modal-overlay" style="display:none" onclick="if(event.target===this)closeModal('schedule-ps-modal')">
+  <div class="modal">
+    <h3>📞 Schedule Phone Screen</h3>
+    <div class="field"><label>Date *</label><input type="date" id="ps-date" required></div>
+    <div class="field"><label>Time *</label><input type="time" id="ps-time" required></div>
+    <div class="field"><label>Notes <span class="optional">(optional)</span></label><input type="text" id="ps-notes" placeholder="e.g. They prefer morning calls"></div>
+    <div class="modal-actions">
+      <button class="btn btn-secondary" onclick="closeModal('schedule-ps-modal')">Cancel</button>
+      <button class="btn btn-primary" style="width:auto;padding:12px 24px" onclick="savePhoneScreenSchedule()">Save</button>
+    </div>
+  </div>
+</div>
+
+<div id="schedule-ip-modal" class="modal-overlay" style="display:none" onclick="if(event.target===this)closeModal('schedule-ip-modal')">
+  <div class="modal">
+    <h3>🤝 Schedule In-Person Interview</h3>
+    <div class="field"><label>Date *</label><input type="date" id="ip-date" required></div>
+    <div class="field"><label>Time *</label><input type="time" id="ip-time" required></div>
+    <div class="field"><label>Notes <span class="optional">(optional)</span></label><input type="text" id="ip-notes" placeholder="e.g. Meet at the store"></div>
+    <div class="modal-actions">
+      <button class="btn btn-secondary" onclick="closeModal('schedule-ip-modal')">Cancel</button>
+      <button class="btn btn-primary" style="width:auto;padding:12px 24px" onclick="saveInPersonSchedule()">Save</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const CONFIG = {
+  API_URL: 'https://script.google.com/macros/s/AKfycbwTO3hiqx-7JsoNGK80DB6DP1uK52lk4isrezT0JmnedMYaac1zhHpzkGG22A0KKxO8Ag/exec',
+  DASHBOARD_PIN: '1300'
+};
+
+// Phone screen questions
+const PS_QUESTIONS = [
+  "What interests you about this role?",
+  "Most recent job — what was your title, company, and day-to-day?",
+  "Most recent pay in that job?",
+  "Management experience (summary of past management roles)?",
+  "Why are you leaving your current role?",
+  "What's your availability — when could you start if we made an offer?",
+  "Do you have any questions for me?"
+];
+
+// In-person questions
+const IP_QUESTIONS = [
+  "Scheduling — have you built staff schedules before? What software or process did you use?",
+  "Inventory — have you managed inventory before? What software or process did you use?",
+  "Hiring — have you interviewed and hired people before? Walk me through your process.",
+  "Firing — have you had to let someone go? What was the situation and how did you handle it?",
+  "Payroll — have you run payroll before? What system/software?",
+  "Team management — tell me about your biggest team management challenge and how you handled it."
+];
+
+let candidates = [];
+let currentFilter = 'all';
+let currentCandidate = null;
+let gradeValues = {};
+let psRatings = {};
+let ipRatings = {};
+
+// ─── Views ───
+function showView(name) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.getElementById('view-' + name).classList.add('active');
+  window.scrollTo(0, 0);
+  if (name === 'dashboard') loadCandidates();
+}
+
+// ─── Toast ───
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+// ─── Login ───
+function checkPin() {
+  const pin = document.getElementById('pin-input').value;
+  if (pin === CONFIG.DASHBOARD_PIN) {
+    sessionStorage.setItem('mgrDashAuth', 'true');
+    document.getElementById('login-error').style.display = 'none';
+    showView('dashboard');
+  } else {
+    document.getElementById('login-error').style.display = 'block';
+    document.getElementById('pin-input').value = '';
+    document.getElementById('pin-input').focus();
+  }
+}
+document.getElementById('pin-input').addEventListener('keydown', e => { if (e.key === 'Enter') checkPin(); });
+function logoutDash() { sessionStorage.removeItem('mgrDashAuth'); showView('login'); }
+if (sessionStorage.getItem('mgrDashAuth')) showView('dashboard');
+
+// ─── Dashboard ───
+async function loadCandidates() {
+  const list = document.getElementById('candidate-list');
+  list.innerHTML = '<div class="loading"><div class="spinner"></div></div>';
+  try {
+    const res = await fetch(CONFIG.API_URL + '?action=getCandidates&pin=' + CONFIG.DASHBOARD_PIN);
+    const json = await res.json();
+    candidates = json.candidates || [];
+    renderCandidates();
+  } catch (err) {
+    list.innerHTML = '<div class="empty-state"><div class="icon">⚠️</div><p>Could not load candidates. Check your API URL.</p></div>';
+  }
+}
+
+function refreshDash() { loadCandidates(); showToast('Refreshed!'); }
+
+function setFilter(filter, btn) {
+  currentFilter = filter;
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderCandidates();
+}
+
+function statusClass(s) {
+  return 'status-' + String(s || 'applied').toLowerCase().replace(/[^a-z]/g, '');
+}
+
+function renderCandidates() {
+  const list = document.getElementById('candidate-list');
+  let filtered = currentFilter === 'all' ? candidates : candidates.filter(c => c.status === currentFilter);
+  if (!filtered.length) {
+    list.innerHTML = '<div class="empty-state"><div class="icon">📋</div><p>No candidates found.</p></div>';
+    renderUpcoming();
+    return;
+  }
+  list.innerHTML = filtered.map((c, i) => {
+    const initials = (c.name || '?').split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
+    const date = c.timestamp ? new Date(c.timestamp).toLocaleDateString() : '';
+    const nextLabel = nextScheduledLabel(c);
+    return `<div class="candidate-row" onclick="openProfile(${c.row})" style="animation-delay:${i*0.04}s">
+      <div class="avatar">${initials}</div>
+      <div class="info">
+        <div class="name">${esc(c.name)}</div>
+        <div class="meta">${esc(c.phone||'')}${date?' · Applied '+date:''}${nextLabel?' · '+nextLabel:''}</div>
+      </div>
+      <div class="right"><span class="status-chip ${statusClass(c.status)}">${esc(c.status||'Applied')}</span></div>
+    </div>`;
+  }).join('');
+  renderUpcoming();
+}
+
+function nextScheduledLabel(c) {
+  // Determine which interview is coming up next
+  if (c.inPersonDate && !c.inPersonInterviewerName) {
+    return `🤝 ${formatDate(c.inPersonDate)}${c.inPersonTime?' '+formatTime(c.inPersonTime):''}`;
+  }
+  if (c.phoneScreenDate && !c.phoneScreenerName) {
+    return `📞 ${formatDate(c.phoneScreenDate)}${c.phoneScreenTime?' '+formatTime(c.phoneScreenTime):''}`;
+  }
+  return '';
+}
+
+// ─── Upcoming panel ───
+function renderUpcoming() {
+  const panel = document.getElementById('upcoming-interviews');
+  const now = new Date(); now.setHours(0,0,0,0);
+
+  const upcoming = [];
+  candidates.forEach(c => {
+    // Phone screen not yet done
+    if (c.phoneScreenDate && !c.phoneScreenerName) {
+      const d = parseDateOnly(c.phoneScreenDate);
+      if (d && d >= now) upcoming.push({ kind: 'phone', c, date: c.phoneScreenDate, time: c.phoneScreenTime, notes: c.phoneScreenNotes });
+    }
+    // In-person not yet done
+    if (c.inPersonDate && !c.inPersonInterviewerName) {
+      const d = parseDateOnly(c.inPersonDate);
+      if (d && d >= now) upcoming.push({ kind: 'inperson', c, date: c.inPersonDate, time: c.inPersonTime, notes: c.inPersonNotes });
+    }
+  });
+  upcoming.sort((a,b) => (String(a.date)+(a.time||'')).localeCompare(String(b.date)+(b.time||'')));
+
+  if (!upcoming.length) { panel.innerHTML = ''; return; }
+
+  panel.innerHTML = `<div class="upcoming-panel">
+    <div class="panel-title">📅 Upcoming Interviews</div>
+    ${upcoming.map(u => {
+      const d = parseDateOnly(u.date);
+      const month = d ? d.toLocaleDateString('en-US', { month: 'short', timeZone: 'America/Chicago' }) : '??';
+      const day = d ? parseInt(d.toLocaleDateString('en-US', { day: 'numeric', timeZone: 'America/Chicago' })) : '?';
+      const kindLabel = u.kind === 'phone' ? 'Phone Screen' : 'In-Person';
+      const kindClass = u.kind === 'phone' ? 'phone' : 'inperson';
+      return `<div class="upcoming-item" onclick="openProfile(${u.c.row})">
+        <div class="date-badge ${u.kind==='phone'?'phone':''}"><div class="month">${month}</div><div class="day">${day}</div></div>
+        <div class="details">
+          <div class="name">${esc(u.c.name)} <span class="upcoming-kind ${kindClass}">${kindLabel}</span></div>
+          <div class="time">${formatTime(u.time)}${u.notes?' · '+esc(u.notes):''}</div>
+        </div>
+      </div>`;
+    }).join('')}
+  </div>`;
+}
+
+// ─── Profile ───
+async function openProfile(row) {
+  showView('profile');
+  const content = document.getElementById('profile-content');
+  content.innerHTML = '<div class="loading"><div class="spinner"></div></div>';
+  try {
+    const res = await fetch(CONFIG.API_URL + '?action=getCandidate&row=' + row + '&pin=' + CONFIG.DASHBOARD_PIN);
+    const c = await res.json();
+    currentCandidate = c; currentCandidate.row = row;
+    renderProfile(c);
+  } catch (err) {
+    content.innerHTML = '<div class="empty-state"><p>Error loading profile.</p></div>';
+  }
+}
+
+function renderProfile(c) {
+  const content = document.getElementById('profile-content');
+  const initials = (c.name||'?').split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
+
+  const hasPS = !!c.phoneScreenerName;
+  const hasIP = !!c.inPersonInterviewerName;
+
+  content.innerHTML = `
+    <div class="profile-header">
+      <div class="avatar">${initials}</div>
+      <div class="details"><h2>${esc(c.name)}</h2><div class="sub">${esc(c.phone||'')}${c.email?' · '+esc(c.email):''}</div></div>
+    </div>
+    <div class="profile-actions">
+      <span class="status-chip ${statusClass(c.status)}">${esc(c.status||'Applied')}</span>
+      <button class="btn btn-secondary btn-sm" onclick="openPhoneScreenModal()">📞 Schedule Phone Screen</button>
+      ${!hasPS?`<button class="btn btn-primary btn-sm" onclick="startPhoneScreen()">📞 Start Phone Screen</button>`:''}
+      <button class="btn btn-secondary btn-sm" onclick="openInPersonModal()">🤝 Schedule In-Person</button>
+      ${hasPS && !hasIP?`<button class="btn btn-primary btn-sm" onclick="startInPerson()">🤝 Start In-Person</button>`:''}
+      <select class="btn btn-secondary btn-sm" onchange="updateStatus(this.value); this.value=''" style="cursor:pointer;">
+        <option value="">Change Status…</option>
+        <option value="Applied">📩 Applied</option>
+        <option value="Phone Screen Scheduled">📞 Phone Screen Scheduled</option>
+        <option value="Phone Screen Done">📞 Phone Screen Done</option>
+        <option value="In-Person Scheduled">🤝 In-Person Scheduled</option>
+        <option value="In-Person Done">🤝 In-Person Done</option>
+        <option value="Hired">✅ Hired</option>
+        <option value="Rejected">❌ Rejected</option>
+      </select>
+    </div>
+
+    <!-- Scheduled interviews -->
+    ${c.phoneScreenDate?`<div class="card" style="border-color:#ddd0ff; background:var(--purple-light);">
+      <div class="card-title" style="color:var(--purple)"><span class="icon" style="background:#fff;color:var(--purple)">📞</span> Phone Screen Scheduled</div>
+      <div class="data-row" style="border-color:#ddd0ff"><span class="label">Date</span><span class="value">${formatDate(c.phoneScreenDate)}</span></div>
+      <div class="data-row" style="border-color:#ddd0ff"><span class="label">Time</span><span class="value">${formatTime(c.phoneScreenTime)}</span></div>
+      ${c.phoneScreenNotes?`<div class="data-row" style="border-color:#ddd0ff"><span class="label">Notes</span><span class="value">${esc(c.phoneScreenNotes)}</span></div>`:''}
+      <div style="margin-top:12px"><button class="btn btn-secondary btn-sm" onclick="clearPhoneScreenSchedule()">✕ Remove</button></div>
+    </div>`:''}
+
+    ${c.inPersonDate?`<div class="card" style="border-color:#c3dafe; background:var(--blue-light);">
+      <div class="card-title" style="color:var(--blue)"><span class="icon" style="background:#fff;color:var(--blue)">🤝</span> In-Person Interview Scheduled</div>
+      <div class="data-row" style="border-color:#c3dafe"><span class="label">Date</span><span class="value">${formatDate(c.inPersonDate)}</span></div>
+      <div class="data-row" style="border-color:#c3dafe"><span class="label">Time</span><span class="value">${formatTime(c.inPersonTime)}</span></div>
+      ${c.inPersonNotes?`<div class="data-row" style="border-color:#c3dafe"><span class="label">Notes</span><span class="value">${esc(c.inPersonNotes)}</span></div>`:''}
+      <div style="margin-top:12px"><button class="btn btn-secondary btn-sm" onclick="clearInPersonSchedule()">✕ Remove</button></div>
+    </div>`:''}
+
+    <!-- Application data -->
+    <div class="card">
+      <div class="card-title"><span class="icon" style="background:var(--blue-light);color:var(--blue)">📝</span> Application</div>
+      <div class="data-row"><span class="label">College / Other Job</span><span class="value">${esc(c.collegeOrOtherJob||'—')}${c.collegeOrOtherJobDesc?' — '+esc(c.collegeOrOtherJobDesc):''}</span></div>
+      <div class="data-row"><span class="label">Open Availability</span><span class="value">${esc(c.openAvailability||'—')}${c.openAvailabilityDesc?' — '+esc(c.openAvailabilityDesc):''}</span></div>
+      <div class="data-row"><span class="label">Can Start</span><span class="value">${formatDate(c.startDate)||'—'}</span></div>
+      <div class="data-row"><span class="label">Full-time $36–40k/yr fit</span><span class="value">${esc(c.roleFit||'—')}</span></div>
+      <div class="data-row"><span class="label">Inventory Exp</span><span class="value">${esc(c.inventoryExp||'—')}${c.inventoryExpDesc?' — '+esc(c.inventoryExpDesc):''}</span></div>
+      <div class="data-row"><span class="label">Scheduling Exp</span><span class="value">${esc(c.schedulingExp||'—')}${c.schedulingExpDesc?' — '+esc(c.schedulingExpDesc):''}</span></div>
+      <div class="data-row"><span class="label">Staff Mgmt Exp</span><span class="value">${esc(c.staffMgmtExp||'—')}${c.staffMgmtExpDesc?' — '+esc(c.staffMgmtExpDesc):''}</span></div>
+      <div class="data-row"><span class="label">Hire/Fire Exp</span><span class="value">${esc(c.hireFireExp||'—')}${c.hireFireExpDesc?' — '+esc(c.hireFireExpDesc):''}</span></div>
+      ${c.notes?`<div class="data-row"><span class="label">Notes</span><span class="value">${esc(c.notes)}</span></div>`:''}
+    </div>
+
+    <!-- Interview tabs -->
+    <div class="card" style="padding:16px 24px 24px;">
+      <div class="tabs">
+        <button class="tab-btn active" onclick="showTab('ps',this)">📞 Phone Screen${hasPS?' ✓':''}</button>
+        <button class="tab-btn" onclick="showTab('ip',this)">🤝 In-Person${hasIP?' ✓':''}</button>
+      </div>
+      <div id="tab-ps" class="tab-panel active">
+        ${hasPS ? renderPhoneScreenData(c) : '<div class="empty-state"><div class="icon">📞</div><p>No phone screen completed yet.</p></div>'}
+      </div>
+      <div id="tab-ip" class="tab-panel">
+        ${hasIP ? renderInPersonData(c) : '<div class="empty-state"><div class="icon">🤝</div><p>No in-person interview completed yet.</p></div>'}
+      </div>
+    </div>
+  `;
+}
+
+function renderPhoneScreenData(c) {
+  const ratingEmoji = r => r==='Strong'?'✅':r==='Okay'?'👍':r==='Weak'?'⚠️':r==='Concerning'?'🚩':'';
+  let questionsHTML = '';
+  PS_QUESTIONS.forEach((q, i) => {
+    const n = i + 1;
+    const answer = c['ps_q'+n+'_answer'];
+    const rating = c['ps_q'+n+'_rating'];
+    if (answer || rating) {
+      questionsHTML += `<div style="padding:12px 0;border-bottom:1px solid #f0f0f0;">
+        <div style="font-size:13px;color:#666;margin-bottom:4px;font-weight:600;">${esc(q)}</div>
+        ${answer?`<div style="font-size:14px;color:#333;margin-top:6px;white-space:pre-wrap;">${esc(answer)}</div>`:''}
+        ${rating?`<div style="margin-top:6px;font-size:13px;">${ratingEmoji(rating)} ${esc(rating)}</div>`:''}
+      </div>`;
+    }
+  });
+  return `
+    <div class="data-row"><span class="label">Interviewer</span><span class="value">${esc(c.phoneScreenerName)}</span></div>
+    <div class="data-row"><span class="label">Move Forward?</span><span class="value" style="font-weight:700">${esc(c.ps_moveForward||'—')}</span></div>
+    ${c.ps_overallNotes?`<div class="data-row"><span class="label">Overall Notes</span><span class="value">${esc(c.ps_overallNotes)}</span></div>`:''}
+    ${questionsHTML?`<div style="margin-top:16px;padding-top:12px;border-top:2px solid #f0f0f0;">
+      <div style="font-weight:600;font-size:14px;margin-bottom:8px;">📋 Responses</div>
+      ${questionsHTML}
+    </div>`:''}
+  `;
+}
+
+function renderInPersonData(c) {
+  const ratingEmoji = r => r==='Strong'?'✅':r==='Okay'?'👍':r==='Weak'?'⚠️':r==='Concerning'?'🚩':'';
+  const grades = [
+    {label:'Leadership', val: parseInt(c.gradeLeadership)||0},
+    {label:'Decision Making', val: parseInt(c.gradeDecisionMaking)||0},
+    {label:'Communication', val: parseInt(c.gradeCommunication)||0},
+    {label:'Reliability', val: parseInt(c.gradeReliability)||0},
+    {label:'Problem Solving', val: parseInt(c.gradeProblemSolving)||0},
+    {label:'Integrity', val: parseInt(c.gradeIntegrity)||0}
+  ];
+  const barColor = v => v>=4?'var(--green)':v>=3?'var(--yellow)':'var(--red)';
+
+  let questionsHTML = '';
+  IP_QUESTIONS.forEach((q, i) => {
+    const n = i + 1;
+    const answer = c['ip_q'+n+'_answer'];
+    const rating = c['ip_q'+n+'_rating'];
+    if (answer || rating) {
+      questionsHTML += `<div style="padding:12px 0;border-bottom:1px solid #f0f0f0;">
+        <div style="font-size:13px;color:#666;margin-bottom:4px;font-weight:600;">${esc(q)}</div>
+        ${answer?`<div style="font-size:14px;color:#333;margin-top:6px;white-space:pre-wrap;">${esc(answer)}</div>`:''}
+        ${rating?`<div style="margin-top:6px;font-size:13px;">${ratingEmoji(rating)} ${esc(rating)}</div>`:''}
+      </div>`;
+    }
+  });
+
+  return `
+    <div class="data-row"><span class="label">Interviewer</span><span class="value">${esc(c.inPersonInterviewerName)}</span></div>
+    <div style="margin-top:16px">${grades.map(g=>`<div class="vibe-score-bar"><span class="label">${g.label}</span><div class="bar"><div class="bar-fill" style="width:${g.val*20}%;background:${barColor(g.val)}"></div></div><span class="score">${g.val}</span></div>`).join('')}</div>
+    <div style="margin-top:12px">
+      <div class="data-row"><span class="label">Enjoy working with?</span><span class="value">${esc(c.enjoyWorking||'—')}</span></div>
+      <div class="data-row"><span class="label">Trust running store?</span><span class="value">${esc(c.trustWithStore||'—')}</span></div>
+      <div class="data-row"><span class="label">Coachability</span><span class="value">${esc(c.coachability||'—')}</span></div>
+      <div class="data-row"><span class="label">Hire Decision</span><span class="value" style="font-weight:700">${esc(c.hireDecision||'—')}</span></div>
+      ${c.ip_overallNotes?`<div class="data-row"><span class="label">Overall Notes</span><span class="value">${esc(c.ip_overallNotes)}</span></div>`:''}
+    </div>
+    ${questionsHTML?`<div style="margin-top:16px;padding-top:12px;border-top:2px solid #f0f0f0;">
+      <div style="font-weight:600;font-size:14px;margin-bottom:8px;">📋 Responses</div>
+      ${questionsHTML}
+    </div>`:''}
+  `;
+}
+
+function showTab(which, btn) {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('tab-' + which).classList.add('active');
+}
+
+// ─── Status update ───
+async function updateStatus(status) {
+  if (!status || !currentCandidate) return;
+  try {
+    const params = new URLSearchParams({ action:'updateStatus', row: currentCandidate.row, pin: CONFIG.DASHBOARD_PIN, status });
+    await fetch(CONFIG.API_URL + '?' + params.toString());
+    currentCandidate.status = status;
+    renderProfile(currentCandidate);
+    showToast('Status updated to ' + status);
+  } catch (err) { showToast('Error updating status'); }
+}
+
+// ─── PHONE SCREEN INTERVIEW ───
+function startPhoneScreen() {
+  if (!currentCandidate) return;
+  showView('phonescreen');
+  document.getElementById('ps-candidate-name').textContent = 'Interviewing: ' + currentCandidate.name;
+  document.getElementById('ps-back-btn').onclick = () => openProfile(currentCandidate.row);
+  psRatings = {};
+  document.getElementById('ps-form').reset();
+  const btn = document.getElementById('ps-submit-btn');
+  btn.disabled = false; btn.textContent = 'Submit Phone Screen';
+  renderPSQuestions();
+}
+
+function renderPSQuestions() {
+  document.getElementById('ps-questions').innerHTML = PS_QUESTIONS.map((q, i) => {
+    const n = i + 1;
+    return `<div class="question-card" style="animation-delay:${i*0.05}s">
+      <div class="question">${n}. ${esc(q)}</div>
+      <textarea name="ps_q${n}_answer" placeholder="Type their answer here..."></textarea>
+      <div class="rating-btns" data-ps-q="${n}">
+        <button type="button" onclick="ratePS(${n},'Strong',this)">✅ Strong</button>
+        <button type="button" onclick="ratePS(${n},'Okay',this)">👍 Okay</button>
+        <button type="button" onclick="ratePS(${n},'Weak',this)">⚠️ Weak</button>
+        <button type="button" onclick="ratePS(${n},'Concerning',this)">🚩 Concerning</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function ratePS(n, rating, btn) {
+  psRatings[n] = rating;
+  btn.parentElement.querySelectorAll('button').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+}
+
+document.getElementById('ps-form').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const btn = document.getElementById('ps-submit-btn');
+  btn.disabled = true; btn.textContent = 'Submitting...';
+  const fd = new FormData(e.target);
+  const data = {
+    action: 'phoneScreen',
+    row: currentCandidate.row,
+    pin: CONFIG.DASHBOARD_PIN,
+    phoneScreenerName: fd.get('phoneScreenerName'),
+    ps_overallNotes: fd.get('ps_overallNotes') || '',
+    ps_moveForward: fd.get('ps_moveForward')
+  };
+  PS_QUESTIONS.forEach((q, i) => {
+    const n = i + 1;
+    data['ps_q'+n+'_answer'] = fd.get('ps_q'+n+'_answer') || '';
+    data['ps_q'+n+'_rating'] = psRatings[n] || '';
+  });
+  try {
+    const params = new URLSearchParams(data);
+    await fetch(CONFIG.API_URL + '?' + params.toString());
+    showToast('Phone screen submitted!');
+    setTimeout(() => openProfile(currentCandidate.row), 800);
+  } catch (err) {
+    showToast('Error submitting');
+    btn.disabled = false; btn.textContent = 'Submit Phone Screen';
+  }
+});
+
+// ─── IN-PERSON INTERVIEW ───
+function startInPerson() {
+  if (!currentCandidate) return;
+  showView('inperson');
+  document.getElementById('ip-candidate-name').textContent = 'Interviewing: ' + currentCandidate.name;
+  document.getElementById('ip-back-btn').onclick = () => openProfile(currentCandidate.row);
+  ipRatings = {}; gradeValues = {};
+  document.getElementById('ip-form').reset();
+  const btn = document.getElementById('ip-submit-btn');
+  btn.disabled = false; btn.textContent = 'Submit In-Person Interview';
+  renderIPQuestions();
+  renderGradeDots();
+}
+
+function renderIPQuestions() {
+  document.getElementById('ip-questions').innerHTML = IP_QUESTIONS.map((q, i) => {
+    const n = i + 1;
+    return `<div class="question-card" style="animation-delay:${i*0.05}s">
+      <div class="question">${n}. ${esc(q)}</div>
+      <textarea name="ip_q${n}_answer" placeholder="Type their answer here..."></textarea>
+      <div class="rating-btns" data-ip-q="${n}">
+        <button type="button" onclick="rateIP(${n},'Strong',this)">✅ Strong</button>
+        <button type="button" onclick="rateIP(${n},'Okay',this)">👍 Okay</button>
+        <button type="button" onclick="rateIP(${n},'Weak',this)">⚠️ Weak</button>
+        <button type="button" onclick="rateIP(${n},'Concerning',this)">🚩 Concerning</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function rateIP(n, rating, btn) {
+  ipRatings[n] = rating;
+  btn.parentElement.querySelectorAll('button').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+}
+
+function renderGradeDots() {
+  document.querySelectorAll('.grade-dots').forEach(container => {
+    const key = container.dataset.grade;
+    container.innerHTML = [0,1,2,3,4,5].map(v =>
+      `<button type="button" onclick="setGrade('${key}',${v},this)">${v}</button>`
+    ).join('');
+  });
+}
+
+function setGrade(key, val, btn) {
+  gradeValues[key] = val;
+  btn.parentElement.querySelectorAll('button').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+}
+
+document.getElementById('ip-form').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const btn = document.getElementById('ip-submit-btn');
+  btn.disabled = true; btn.textContent = 'Submitting...';
+  const fd = new FormData(e.target);
+  const data = {
+    action: 'inPerson',
+    row: currentCandidate.row,
+    pin: CONFIG.DASHBOARD_PIN,
+    inPersonInterviewerName: fd.get('inPersonInterviewerName'),
+    enjoyWorking: fd.get('enjoyWorking'),
+    trustWithStore: fd.get('trustWithStore'),
+    coachability: fd.get('coachability'),
+    hireDecision: fd.get('hireDecision'),
+    ip_overallNotes: fd.get('ip_overallNotes') || '',
+    ...gradeValues
+  };
+  IP_QUESTIONS.forEach((q, i) => {
+    const n = i + 1;
+    data['ip_q'+n+'_answer'] = fd.get('ip_q'+n+'_answer') || '';
+    data['ip_q'+n+'_rating'] = ipRatings[n] || '';
+  });
+  try {
+    const params = new URLSearchParams(data);
+    await fetch(CONFIG.API_URL + '?' + params.toString());
+    showToast('In-Person interview submitted!');
+    setTimeout(() => openProfile(currentCandidate.row), 800);
+  } catch (err) {
+    showToast('Error submitting');
+    btn.disabled = false; btn.textContent = 'Submit In-Person Interview';
+  }
+});
+
+// ─── Scheduling ───
+function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+
+function openPhoneScreenModal() {
+  const modal = document.getElementById('schedule-ps-modal');
+  const dateInput = document.getElementById('ps-date');
+  const timeInput = document.getElementById('ps-time');
+  const notesInput = document.getElementById('ps-notes');
+  if (currentCandidate.phoneScreenDate) {
+    dateInput.value = datePartOnly(currentCandidate.phoneScreenDate);
+    timeInput.value = timePartOnly(currentCandidate.phoneScreenTime);
+    notesInput.value = currentCandidate.phoneScreenNotes || '';
+  } else {
+    dateInput.value = ''; timeInput.value = ''; notesInput.value = '';
+  }
+  dateInput.min = new Date().toISOString().split('T')[0];
+  modal.style.display = 'flex';
+}
+
+function openInPersonModal() {
+  const modal = document.getElementById('schedule-ip-modal');
+  const dateInput = document.getElementById('ip-date');
+  const timeInput = document.getElementById('ip-time');
+  const notesInput = document.getElementById('ip-notes');
+  if (currentCandidate.inPersonDate) {
+    dateInput.value = datePartOnly(currentCandidate.inPersonDate);
+    timeInput.value = timePartOnly(currentCandidate.inPersonTime);
+    notesInput.value = currentCandidate.inPersonNotes || '';
+  } else {
+    dateInput.value = ''; timeInput.value = ''; notesInput.value = '';
+  }
+  dateInput.min = new Date().toISOString().split('T')[0];
+  modal.style.display = 'flex';
+}
+
+async function savePhoneScreenSchedule() {
+  const dateVal = document.getElementById('ps-date').value;
+  const timeVal = document.getElementById('ps-time').value;
+  const notesVal = document.getElementById('ps-notes').value;
+  if (!dateVal || !timeVal) { showToast('Please enter date and time'); return; }
+  try {
+    const params = new URLSearchParams({
+      action: 'schedulePhoneScreen', row: currentCandidate.row, pin: CONFIG.DASHBOARD_PIN,
+      phoneScreenDate: dateVal, phoneScreenTime: timeVal, phoneScreenNotes: notesVal
+    });
+    await fetch(CONFIG.API_URL + '?' + params.toString());
+    currentCandidate.phoneScreenDate = dateVal;
+    currentCandidate.phoneScreenTime = timeVal;
+    currentCandidate.phoneScreenNotes = notesVal;
+    closeModal('schedule-ps-modal');
+    renderProfile(currentCandidate);
+    showToast('Phone screen scheduled');
+  } catch (err) { showToast('Error scheduling'); }
+}
+
+async function saveInPersonSchedule() {
+  const dateVal = document.getElementById('ip-date').value;
+  const timeVal = document.getElementById('ip-time').value;
+  const notesVal = document.getElementById('ip-notes').value;
+  if (!dateVal || !timeVal) { showToast('Please enter date and time'); return; }
+  try {
+    const params = new URLSearchParams({
+      action: 'scheduleInPerson', row: currentCandidate.row, pin: CONFIG.DASHBOARD_PIN,
+      inPersonDate: dateVal, inPersonTime: timeVal, inPersonNotes: notesVal
+    });
+    await fetch(CONFIG.API_URL + '?' + params.toString());
+    currentCandidate.inPersonDate = dateVal;
+    currentCandidate.inPersonTime = timeVal;
+    currentCandidate.inPersonNotes = notesVal;
+    closeModal('schedule-ip-modal');
+    renderProfile(currentCandidate);
+    showToast('In-person interview scheduled');
+  } catch (err) { showToast('Error scheduling'); }
+}
+
+async function clearPhoneScreenSchedule() {
+  if (!confirm('Remove the scheduled phone screen?')) return;
+  try {
+    const params = new URLSearchParams({
+      action: 'schedulePhoneScreen', row: currentCandidate.row, pin: CONFIG.DASHBOARD_PIN,
+      phoneScreenDate: '', phoneScreenTime: '', phoneScreenNotes: ''
+    });
+    await fetch(CONFIG.API_URL + '?' + params.toString());
+    currentCandidate.phoneScreenDate = '';
+    currentCandidate.phoneScreenTime = '';
+    currentCandidate.phoneScreenNotes = '';
+    renderProfile(currentCandidate);
+    showToast('Phone screen removed');
+  } catch (err) { showToast('Error'); }
+}
+
+async function clearInPersonSchedule() {
+  if (!confirm('Remove the scheduled in-person interview?')) return;
+  try {
+    const params = new URLSearchParams({
+      action: 'scheduleInPerson', row: currentCandidate.row, pin: CONFIG.DASHBOARD_PIN,
+      inPersonDate: '', inPersonTime: '', inPersonNotes: ''
+    });
+    await fetch(CONFIG.API_URL + '?' + params.toString());
+    currentCandidate.inPersonDate = '';
+    currentCandidate.inPersonTime = '';
+    currentCandidate.inPersonNotes = '';
+    renderProfile(currentCandidate);
+    showToast('In-person removed');
+  } catch (err) { showToast('Error'); }
+}
+
+// ─── Helpers ───
+function parseDateOnly(v) {
+  if (!v) return null;
+  const s = String(v).trim();
+  const datePart = s.includes('T') ? s.split('T')[0] : s;
+  const d = new Date(datePart + 'T00:00:00');
+  return isNaN(d.getTime()) ? null : d;
+}
+function datePartOnly(v) {
+  if (!v) return '';
+  const s = String(v).trim();
+  return s.includes('T') ? s.split('T')[0] : s;
+}
+function timePartOnly(v) {
+  if (!v) return '';
+  const s = String(v).trim();
+  if (s.includes('T')) return s.split('T')[1].substring(0,5);
+  if (s.includes(':')) return s.substring(0,5);
+  return s;
+}
+function formatDate(v) {
+  if (!v) return '';
+  const d = parseDateOnly(v);
+  if (!d) return String(v);
+  return d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', timeZone: 'America/Chicago' });
+}
+function formatTime(v) {
+  if (!v) return '';
+  const s = String(v).trim();
+  if (s.includes('T')) {
+    const d = new Date(s);
+    if (!isNaN(d.getTime())) return d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', timeZone: 'America/Chicago' });
+  }
+  if (s.includes(':')) {
+    const bits = s.split(':');
+    const h = parseInt(bits[0]); const m = bits[1].substring(0,2);
+    const ampm = h >= 12 ? 'PM' : 'AM';
+    const hr12 = h % 12 || 12;
+    return `${hr12}:${m} ${ampm}`;
+  }
+  return s;
+}
+function esc(str) { if(!str) return ''; const d = document.createElement('div'); d.textContent = String(str); return d.innerHTML; }
+</script>
+</body>
+</html>

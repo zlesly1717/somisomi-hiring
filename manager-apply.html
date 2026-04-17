@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SomiSomi — Manager Application</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Fraunces:wght@600;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #FFF8F0;
+  --surface: #FFFFFF;
+  --surface-alt: #FFF1E6;
+  --border: #F0E0D0;
+  --text: #2D1B0E;
+  --text-soft: #8B7355;
+  --accent: #E8572A;
+  --accent-hover: #D04A20;
+  --accent-light: #FEF0EB;
+  --green: #2D8B46;
+  --green-light: #EDFAF1;
+  --yellow: #D4930D;
+  --yellow-light: #FFF8E7;
+  --blue: #2B6CB0;
+  --blue-light: #EBF4FF;
+  --radius: 12px;
+  --shadow: 0 1px 3px rgba(45,27,14,0.06), 0 4px 12px rgba(45,27,14,0.04);
+  --shadow-lg: 0 4px 12px rgba(45,27,14,0.08), 0 12px 32px rgba(45,27,14,0.06);
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; -webkit-font-smoothing: antialiased; }
+.container { max-width: 720px; margin: 0 auto; padding: 24px 16px 80px; }
+h1, h2, h3 { font-family: 'Fraunces', serif; }
+.page-header { text-align: center; padding: 40px 0 32px; }
+.page-header .logo { font-family: 'Fraunces', serif; font-size: 28px; font-weight: 800; color: var(--accent); letter-spacing: -0.5px; }
+.page-header h1 { font-size: 22px; font-weight: 600; margin-top: 4px; }
+.page-header p { color: var(--text-soft); margin-top: 6px; font-size: 15px; }
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 24px; margin-bottom: 16px; box-shadow: var(--shadow); animation: fadeUp 0.35s ease both; }
+.card-title { font-family: 'Fraunces', serif; font-size: 17px; font-weight: 700; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+.card-title .icon { width: 28px; height: 28px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 14px; flex-shrink: 0; }
+.field { margin-bottom: 16px; }
+.field:last-child { margin-bottom: 0; }
+.field label { display: block; font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 6px; letter-spacing: 0.2px; }
+.field label .optional { font-weight: 400; color: var(--text-soft); font-size: 12px; }
+input[type="text"],input[type="email"],input[type="tel"],input[type="date"],input[type="number"],select,textarea {
+  width: 100%; padding: 10px 14px; border: 1.5px solid var(--border); border-radius: 8px;
+  font-family: 'DM Sans', sans-serif; font-size: 15px; color: var(--text);
+  background: var(--surface); transition: border-color 0.2s, box-shadow 0.2s; outline: none;
+}
+input:focus, select:focus, textarea:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-light); }
+textarea { resize: vertical; min-height: 70px; }
+.row { display: grid; gap: 12px; }
+.row-2 { grid-template-columns: 1fr 1fr; }
+.radio-group { display: flex; gap: 8px; flex-wrap: wrap; }
+.radio-group label { display: flex; align-items: center; gap: 6px; font-size: 14px; font-weight: 400; cursor: pointer; padding: 8px 14px; border: 1.5px solid var(--border); border-radius: 8px; transition: all 0.2s; user-select: none; }
+.radio-group label:has(input:checked) { border-color: var(--accent); background: var(--accent-light); color: var(--accent); font-weight: 500; }
+.radio-group input { display: none; }
+.btn-primary { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 14px; border: none; border-radius: 10px; font-family: 'DM Sans', sans-serif; font-size: 16px; font-weight: 600; cursor: pointer; transition: all 0.2s; background: var(--accent); color: #fff; width: 100%; box-shadow: 0 2px 8px rgba(232,87,42,0.25); }
+.btn-primary:hover { background: var(--accent-hover); transform: translateY(-1px); }
+.btn-primary:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+.info-box { background: var(--surface-alt); border: 1px solid var(--border); border-radius: 10px; padding: 16px; font-size: 14px; line-height: 1.6; }
+.info-box strong { font-weight: 600; }
+.toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(100px); background: var(--text); color: #fff; padding: 12px 24px; border-radius: 10px; font-size: 14px; font-weight: 500; box-shadow: var(--shadow-lg); z-index: 1000; transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); }
+.toast.show { transform: translateX(-50%) translateY(0); }
+.reveal { display: none; margin-top: 10px; }
+.reveal.show { display: block; animation: fadeUp 0.3s ease; }
+@media (max-width: 600px) { .row-2 { grid-template-columns: 1fr; } }
+@keyframes fadeUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+</style>
+</head>
+<body>
+
+<div class="toast" id="toast"></div>
+
+<div id="view-apply">
+  <div class="container">
+    <div class="page-header">
+      <div class="logo">SomiSomi</div>
+      <h1>Store Manager Application</h1>
+      <p>Metropark Square Location</p>
+    </div>
+
+    <form id="apply-form">
+
+      <!-- Contact -->
+      <div class="card">
+        <div class="card-title"><span class="icon" style="background:var(--accent-light);color:var(--accent)">👤</span> Contact Information</div>
+        <div class="field">
+          <label>Full Name *</label>
+          <input type="text" name="name" required placeholder="First and Last">
+        </div>
+        <div class="row row-2" style="margin-top:12px">
+          <div class="field">
+            <label>Email *</label>
+            <input type="email" name="email" required placeholder="you@email.com">
+          </div>
+          <div class="field">
+            <label>Phone Number *</label>
+            <input type="tel" name="phone" required placeholder="(000) 000-0000">
+          </div>
+        </div>
+      </div>
+
+      <!-- Availability -->
+      <div class="card">
+        <div class="card-title"><span class="icon" style="background:var(--blue-light);color:var(--blue)">📅</span> Availability</div>
+
+        <div class="field">
+          <label>Are you currently in college or do you have another job? *</label>
+          <div class="radio-group">
+            <label><input type="radio" name="collegeOrOtherJob" value="No" required> No</label>
+            <label><input type="radio" name="collegeOrOtherJob" value="Yes"> Yes</label>
+          </div>
+          <div class="reveal" id="reveal-collegeOrOtherJob">
+            <input type="text" name="collegeOrOtherJobDesc" placeholder="Please describe (e.g. full-time student at ..., part-time job at ...)">
+          </div>
+        </div>
+
+        <div class="field" style="margin-top:16px">
+          <label>Open availability (able to work any day, any shift)? *</label>
+          <div class="radio-group">
+            <label><input type="radio" name="openAvailability" value="Yes" required> Yes</label>
+            <label><input type="radio" name="openAvailability" value="Partial"> Partial</label>
+            <label><input type="radio" name="openAvailability" value="No"> No</label>
+          </div>
+          <div class="reveal" id="reveal-openAvailability">
+            <input type="text" name="openAvailabilityDesc" placeholder="Please describe your availability">
+          </div>
+        </div>
+
+        <div class="field" style="margin-top:16px">
+          <label>When could you start? *</label>
+          <input type="date" name="startDate" required>
+        </div>
+      </div>
+
+      <!-- Role Fit / Gatekeeper -->
+      <div class="card">
+        <div class="card-title"><span class="icon" style="background:var(--yellow-light);color:var(--yellow)">💼</span> Role Fit</div>
+        <div class="field">
+          <label>Are you okay with full-time, open availability, and $36,000–$40,000/yr? *</label>
+          <div class="radio-group">
+            <label><input type="radio" name="roleFit" value="Yes" required> ✅ Yes</label>
+            <label><input type="radio" name="roleFit" value="Let's discuss"> 💬 Let's discuss</label>
+            <label><input type="radio" name="roleFit" value="No"> ❌ No</label>
+          </div>
+        </div>
+      </div>
+
+      <!-- Experience -->
+      <div class="card">
+        <div class="card-title"><span class="icon" style="background:var(--green-light);color:var(--green)">✅</span> Experience</div>
+
+        <div class="field">
+          <label>Inventory experience? *</label>
+          <div class="radio-group">
+            <label><input type="radio" name="inventoryExp" value="Yes" required> Yes</label>
+            <label><input type="radio" name="inventoryExp" value="No"> No</label>
+          </div>
+          <div class="reveal" id="reveal-inventoryExp">
+            <textarea name="inventoryExpDesc" placeholder="Please describe (software used, how long, scope)"></textarea>
+          </div>
+        </div>
+
+        <div class="field" style="margin-top:16px">
+          <label>Scheduling experience? *</label>
+          <div class="radio-group">
+            <label><input type="radio" name="schedulingExp" value="Yes" required> Yes</label>
+            <label><input type="radio" name="schedulingExp" value="No"> No</label>
+          </div>
+          <div class="reveal" id="reveal-schedulingExp">
+            <textarea name="schedulingExpDesc" placeholder="Please describe (software used, team size, how long)"></textarea>
+          </div>
+        </div>
+
+        <div class="field" style="margin-top:16px">
+          <label>Staff management experience? *</label>
+          <div class="radio-group">
+            <label><input type="radio" name="staffMgmtExp" value="Yes" required> Yes</label>
+            <label><input type="radio" name="staffMgmtExp" value="No"> No</label>
+          </div>
+          <div class="reveal" id="reveal-staffMgmtExp">
+            <textarea name="staffMgmtExpDesc" placeholder="Please describe (team size, how long, industry)"></textarea>
+          </div>
+        </div>
+
+        <div class="field" style="margin-top:16px">
+          <label>Hiring / firing experience? *</label>
+          <div class="radio-group">
+            <label><input type="radio" name="hireFireExp" value="Yes" required> Yes</label>
+            <label><input type="radio" name="hireFireExp" value="No"> No</label>
+          </div>
+          <div class="reveal" id="reveal-hireFireExp">
+            <textarea name="hireFireExpDesc" placeholder="Please describe"></textarea>
+          </div>
+        </div>
+      </div>
+
+      <!-- Notes -->
+      <div class="card">
+        <div class="card-title"><span class="icon" style="background:var(--accent-light);color:var(--accent)">📝</span> Anything Else</div>
+        <div class="field">
+          <label>Anything else you'd like us to know? <span class="optional">(optional)</span></label>
+          <textarea name="notes" placeholder="Tell us anything else you want us to know"></textarea>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="info-box">
+          <strong>🍦 About the role</strong><br><br>
+          Store Manager for our Metropark Square SomiSomi location. Full-time (40 hrs/wk), salaried $36,000–$40,000 depending on experience. You'd be running the whole location — scheduling, inventory, hiring/firing, training, and daily operations.<br><br>
+          <strong>Our motto:</strong> Be on time, ready to learn, and work with a positive attitude.
+        </div>
+      </div>
+
+      <button type="submit" class="btn-primary" id="apply-btn">Submit Application</button>
+    </form>
+  </div>
+</div>
+
+<div id="view-thankyou" style="display:none;">
+  <div class="container" style="display:flex;align-items:center;justify-content:center;min-height:70vh;">
+    <div style="text-align:center;">
+      <div style="font-size:56px;margin-bottom:16px;">🎉</div>
+      <h1 style="font-family:'Fraunces',serif;font-size:26px;margin-bottom:8px;">Application Submitted!</h1>
+      <p style="color:var(--text-soft);font-size:16px;max-width:400px;margin:0 auto;line-height:1.6;">
+        Thank you for applying to be a SomiSomi Store Manager. We'll review your application and reach out about next steps.
+      </p>
+    </div>
+  </div>
+</div>
+
+<script>
+const CONFIG = {
+  API_URL: 'https://script.google.com/macros/s/AKfycbwTO3hiqx-7JsoNGK80DB6DP1uK52lk4isrezT0JmnedMYaac1zhHpzkGG22A0KKxO8Ag/exec'
+};
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+// Reveal logic
+function setupReveal(name, showValues) {
+  document.querySelectorAll(`input[name="${name}"]`).forEach(r => {
+    r.addEventListener('change', () => {
+      const reveal = document.getElementById('reveal-' + name);
+      if (reveal) reveal.classList.toggle('show', showValues.includes(r.value) && r.checked);
+    });
+  });
+}
+setupReveal('collegeOrOtherJob', ['Yes']);
+setupReveal('openAvailability',  ['No', 'Partial']);
+setupReveal('inventoryExp',      ['Yes']);
+setupReveal('schedulingExp',     ['Yes']);
+setupReveal('staffMgmtExp',      ['Yes']);
+setupReveal('hireFireExp',       ['Yes']);
+
+// Submit
+document.getElementById('apply-form').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const btn = document.getElementById('apply-btn');
+  btn.disabled = true; btn.textContent = 'Submitting...';
+
+  const fd = new FormData(e.target);
+  const data = { type: 'application' };
+  for (const [key, val] of fd.entries()) data[key] = val;
+
+  try {
+    await fetch(CONFIG.API_URL, {
+      method: 'POST', mode: 'no-cors',
+      headers: { 'Content-Type': 'text/plain' },
+      body: JSON.stringify(data)
+    });
+    document.getElementById('view-apply').style.display = 'none';
+    document.getElementById('view-thankyou').style.display = 'block';
+    window.scrollTo(0, 0);
+  } catch (err) {
+    showToast('Error submitting. Please try again.');
+    btn.disabled = false; btn.textContent = 'Submit Application';
+  }
+});
+</script>
+</body>
+</html>
