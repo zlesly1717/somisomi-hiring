@@ -285,22 +285,31 @@ function showToast(msg) {
   setTimeout(() => t.classList.remove('show'), 3000);
 }
 
-function setupReveal(name, showValues) {
+function setupReveal(name, showValues, requireWhenShown) {
   document.querySelectorAll(`input[name="${name}"]`).forEach(r => {
     r.addEventListener('change', () => {
       const reveal = document.getElementById('reveal-' + name);
-      if (reveal) reveal.classList.toggle('show', showValues.includes(r.value) && r.checked);
+      if (!reveal) return;
+      const shouldShow = showValues.includes(r.value) && r.checked;
+      reveal.classList.toggle('show', shouldShow);
+      if (requireWhenShown) {
+        const field = reveal.querySelector('textarea, input');
+        if (field) {
+          if (shouldShow) field.setAttribute('required', 'required');
+          else { field.removeAttribute('required'); field.value = ''; }
+        }
+      }
     });
   });
 }
-setupReveal('collegeOrOtherJob',   ['Yes']);
-setupReveal('openAvailability',    ['Partial','No']);
-setupReveal('roleFit',             ["Let's discuss"]);
-setupReveal('inventoryExp',        ['Yes']);
-setupReveal('schedulingExp',       ['Yes']);
-setupReveal('hireFireExp',         ['Yes']);
-setupReveal('trainingExp',         ['Yes']);
-setupReveal('customerServiceExp',  ['Yes']);
+setupReveal('collegeOrOtherJob',   ['Yes'],             false);
+setupReveal('openAvailability',    ['Partial','No'],    false);
+setupReveal('roleFit',             ["Let's discuss"],   true);
+setupReveal('inventoryExp',        ['Yes'],             true);
+setupReveal('schedulingExp',       ['Yes'],             true);
+setupReveal('hireFireExp',         ['Yes'],             true);
+setupReveal('trainingExp',         ['Yes'],             true);
+setupReveal('customerServiceExp',  ['Yes'],             true);
 
 document.getElementById('apply-form').addEventListener('submit', async (e) => {
   e.preventDefault();
