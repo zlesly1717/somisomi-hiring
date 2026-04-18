@@ -121,6 +121,14 @@ textarea { resize: vertical; min-height: 70px; }
 .tab-panel { display: none; }
 .tab-panel.active { display: block; animation: fadeUp 0.3s ease; }
 
+/* Review card — shows application answer + notes box */
+.review-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 18px; margin-bottom: 12px; box-shadow: var(--shadow); animation: fadeUp 0.35s ease both; }
+.review-card .review-label { font-size: 12px; font-weight: 700; color: var(--text-soft); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
+.review-card .review-answer { background: var(--surface-alt); border-left: 3px solid var(--accent); padding: 10px 14px; border-radius: 6px; font-size: 14px; color: var(--text); white-space: pre-wrap; margin-bottom: 10px; word-break: break-word; }
+.review-card .review-answer.empty { color: var(--text-soft); font-style: italic; }
+.review-card textarea { min-height: 60px; font-size: 14px; }
+.review-card .notes-label { font-size: 12px; font-weight: 600; color: var(--text-soft); margin-bottom: 4px; display: block; }
+
 .question-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; margin-bottom: 12px; box-shadow: var(--shadow); animation: fadeUp 0.35s ease both; }
 .question-card .question { font-weight: 600; font-size: 15px; margin-bottom: 10px; }
 .question-card textarea { min-height: 80px; margin-bottom: 10px; }
@@ -184,6 +192,7 @@ textarea { resize: vertical; min-height: 70px; }
 
 <div class="toast" id="toast"></div>
 
+<!-- LOGIN -->
 <div id="view-login" class="view active">
   <div class="container">
     <div class="login-card card">
@@ -198,6 +207,7 @@ textarea { resize: vertical; min-height: 70px; }
   </div>
 </div>
 
+<!-- DASHBOARD -->
 <div id="view-dashboard" class="view">
   <div class="container wide">
     <div class="page-header" style="text-align:left; padding-bottom:20px;">
@@ -227,6 +237,7 @@ textarea { resize: vertical; min-height: 70px; }
   </div>
 </div>
 
+<!-- PROFILE -->
 <div id="view-profile" class="view">
   <div class="container">
     <button class="profile-back" onclick="showView('dashboard')">← Back to Dashboard</button>
@@ -234,12 +245,14 @@ textarea { resize: vertical; min-height: 70px; }
   </div>
 </div>
 
+<!-- PHONE SCREEN -->
 <div id="view-phonescreen" class="view">
   <div class="container">
     <button class="profile-back" id="ps-back-btn">← Back to Profile</button>
     <div class="page-header" style="text-align:left; padding-top:0;">
       <h1>📞 Phone Screen</h1>
       <p id="ps-candidate-name"></p>
+      <p style="margin-top:8px;font-size:13px;">Review each answer with them. Add notes as they elaborate. Skip notes if nothing new.</p>
     </div>
     <form id="ps-form">
       <div class="card">
@@ -249,12 +262,14 @@ textarea { resize: vertical; min-height: 70px; }
           <input type="text" name="phoneScreenerName" required>
         </div>
       </div>
-      <div id="ps-questions"></div>
+
+      <div id="ps-review-cards"></div>
+
       <div class="card">
-        <div class="card-title"><span class="icon" style="background:var(--green-light);color:var(--green)">🎯</span> Overall</div>
+        <div class="card-title"><span class="icon" style="background:var(--green-light);color:var(--green)">🎯</span> Overall Vibe</div>
         <div class="field">
-          <label>Overall notes <span class="optional">(optional)</span></label>
-          <textarea name="ps_overallNotes"></textarea>
+          <label>General notes about their vibe <span class="optional">(optional)</span></label>
+          <textarea name="ps_overallNotes" placeholder="Your overall impression from the call — energy, communication style, anything that stood out"></textarea>
         </div>
         <div class="field" style="margin-top:12px">
           <label>Move forward to in-person interview? *</label>
@@ -265,11 +280,13 @@ textarea { resize: vertical; min-height: 70px; }
           </div>
         </div>
       </div>
+
       <button type="submit" class="btn btn-primary" id="ps-submit-btn">Submit Phone Screen</button>
     </form>
   </div>
 </div>
 
+<!-- IN-PERSON -->
 <div id="view-inperson" class="view">
   <div class="container">
     <button class="profile-back" id="ip-back-btn">← Back to Profile</button>
@@ -341,6 +358,7 @@ textarea { resize: vertical; min-height: 70px; }
   </div>
 </div>
 
+<!-- MODALS -->
 <div id="schedule-ps-modal" class="modal-overlay" style="display:none" onclick="if(event.target===this)closeModal('schedule-ps-modal')">
   <div class="modal">
     <h3>📞 Schedule Phone Screen</h3>
@@ -373,14 +391,21 @@ const CONFIG = {
   DASHBOARD_PIN: '1300'
 };
 
-const PS_QUESTIONS = [
-  "What interests you about this role?",
-  "Most recent job — what was your title, company, and day-to-day?",
-  "Most recent pay in that job?",
-  "Management experience (summary of past management roles)?",
-  "Why are you leaving your current role?",
-  "What's your availability — when could you start if we made an offer?",
-  "Do you have any questions for me?"
+// Phone screen review items — { notesField: 'ps_...', label, getAnswer(c) }
+const PS_REVIEW_ITEMS = [
+  { notesField: 'ps_collegeNotes',           label: 'College / Other Job',            getAnswer: c => joinYesNo(c.collegeOrOtherJob, c.collegeOrOtherJobDesc) },
+  { notesField: 'ps_availabilityNotes',      label: 'Open Availability',              getAnswer: c => joinYesNo(c.openAvailability,  c.openAvailabilityDesc) },
+  { notesField: 'ps_startDateNotes',         label: 'When Can They Start',            getAnswer: c => formatDate(c.startDate) },
+  { notesField: 'ps_roleFitNotes',           label: 'Role Fit ($36–40k, Full-time)',  getAnswer: c => joinYesNo(c.roleFit, c.roleFitDiscussDesc) },
+  { notesField: 'ps_recentJobNotes',         label: 'Most Recent Job',                getAnswer: c => [c.recentJobTitle, c.recentJobCompany].filter(Boolean).join(' @ ') + (c.recentJobDayToDay?'\n\n'+c.recentJobDayToDay:'') },
+  { notesField: 'ps_recentPayNotes',         label: 'Most Recent Pay',                getAnswer: c => c.recentPay },
+  { notesField: 'ps_whyLeavingNotes',        label: 'Why Leaving',                    getAnswer: c => c.whyLeaving },
+  { notesField: 'ps_inventoryNotes',         label: 'Inventory Experience',           getAnswer: c => joinYesNo(c.inventoryExp, c.inventoryExpDesc) },
+  { notesField: 'ps_schedulingNotes',        label: 'Scheduling Experience',          getAnswer: c => joinYesNo(c.schedulingExp, c.schedulingExpDesc) },
+  { notesField: 'ps_hireFireNotes',          label: 'Hiring / Firing Experience',     getAnswer: c => joinYesNo(c.hireFireExp, c.hireFireExpDesc) },
+  { notesField: 'ps_trainingNotes',          label: 'Training Experience',            getAnswer: c => joinYesNo(c.trainingExp, c.trainingExpDesc) },
+  { notesField: 'ps_customerServiceNotes',   label: 'Customer Service Experience',    getAnswer: c => joinYesNo(c.customerServiceExp, c.customerServiceExpDesc) },
+  { notesField: 'ps_applicationNotesNotes',  label: 'Anything Else (from application)', getAnswer: c => c.notes }
 ];
 
 const IP_QUESTIONS = [
@@ -392,11 +417,16 @@ const IP_QUESTIONS = [
   "Team management — tell me about your biggest team management challenge and how you handled it."
 ];
 
+function joinYesNo(yesNoValue, desc) {
+  const yn = yesNoValue || '';
+  if (desc) return yn + (yn?' — ':'') + desc;
+  return yn || '—';
+}
+
 let candidates = [];
 let currentFilter = 'all';
 let currentCandidate = null;
 let gradeValues = {};
-let psRatings = {};
 let ipRatings = {};
 
 function showView(name) {
@@ -617,27 +647,25 @@ function renderProfile(c) {
 }
 
 function renderPhoneScreenData(c) {
-  const ratingEmoji = r => r==='Strong'?'✅':r==='Okay'?'👍':r==='Weak'?'⚠️':r==='Concerning'?'🚩':'';
-  let questionsHTML = '';
-  PS_QUESTIONS.forEach((q, i) => {
-    const n = i + 1;
-    const answer = c['ps_q'+n+'_answer'];
-    const rating = c['ps_q'+n+'_rating'];
-    if (answer || rating) {
-      questionsHTML += `<div style="padding:12px 0;border-bottom:1px solid #f0f0f0;">
-        <div style="font-size:13px;color:#666;margin-bottom:4px;font-weight:600;">${esc(q)}</div>
-        ${answer?`<div style="font-size:14px;color:#333;margin-top:6px;white-space:pre-wrap;">${esc(answer)}</div>`:''}
-        ${rating?`<div style="margin-top:6px;font-size:13px;">${ratingEmoji(rating)} ${esc(rating)}</div>`:''}
+  let itemsHTML = '';
+  PS_REVIEW_ITEMS.forEach(item => {
+    const answer = item.getAnswer(c) || '';
+    const notes = c[item.notesField] || '';
+    if (notes || answer) {
+      itemsHTML += `<div style="padding:12px 0;border-bottom:1px solid #f0f0f0;">
+        <div style="font-size:12px;color:var(--text-soft);font-weight:700;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">${esc(item.label)}</div>
+        ${answer?`<div style="font-size:13px;color:#666;margin-bottom:6px;white-space:pre-wrap;"><em>Applied:</em> ${esc(answer)}</div>`:''}
+        ${notes?`<div style="font-size:14px;color:#333;background:var(--purple-light);padding:8px 12px;border-radius:6px;border-left:3px solid var(--purple);white-space:pre-wrap;"><strong>Phone screen notes:</strong> ${esc(notes)}</div>`:''}
       </div>`;
     }
   });
   return `
     <div class="data-row"><span class="label">Interviewer</span><span class="value">${esc(c.phoneScreenerName)}</span></div>
     <div class="data-row"><span class="label">Move Forward?</span><span class="value" style="font-weight:700">${esc(c.ps_moveForward||'—')}</span></div>
-    ${c.ps_overallNotes?`<div class="data-row"><span class="label">Overall Notes</span><span class="value">${esc(c.ps_overallNotes)}</span></div>`:''}
-    ${questionsHTML?`<div style="margin-top:16px;padding-top:12px;border-top:2px solid #f0f0f0;">
-      <div style="font-weight:600;font-size:14px;margin-bottom:8px;">📋 Responses</div>
-      ${questionsHTML}
+    ${c.ps_overallNotes?`<div class="data-row"><span class="label">Overall Vibe</span><span class="value">${esc(c.ps_overallNotes)}</span></div>`:''}
+    ${itemsHTML?`<div style="margin-top:16px;padding-top:12px;border-top:2px solid #f0f0f0;">
+      <div style="font-weight:600;font-size:14px;margin-bottom:8px;">📋 Review Notes</div>
+      ${itemsHTML}
     </div>`:''}
   `;
 }
@@ -703,38 +731,32 @@ async function updateStatus(status) {
   } catch (err) { showToast('Error updating status'); }
 }
 
+// ─── PHONE SCREEN ───
 function startPhoneScreen() {
   if (!currentCandidate) return;
   showView('phonescreen');
   document.getElementById('ps-candidate-name').textContent = 'Interviewing: ' + currentCandidate.name;
   document.getElementById('ps-back-btn').onclick = () => openProfile(currentCandidate.row);
-  psRatings = {};
   document.getElementById('ps-form').reset();
   const btn = document.getElementById('ps-submit-btn');
   btn.disabled = false; btn.textContent = 'Submit Phone Screen';
-  renderPSQuestions();
+  renderPSReviewCards();
 }
 
-function renderPSQuestions() {
-  document.getElementById('ps-questions').innerHTML = PS_QUESTIONS.map((q, i) => {
-    const n = i + 1;
-    return `<div class="question-card" style="animation-delay:${i*0.05}s">
-      <div class="question">${n}. ${esc(q)}</div>
-      <textarea name="ps_q${n}_answer"></textarea>
-      <div class="rating-btns" data-ps-q="${n}">
-        <button type="button" onclick="ratePS(${n},'Strong',this)">✅ Strong</button>
-        <button type="button" onclick="ratePS(${n},'Okay',this)">👍 Okay</button>
-        <button type="button" onclick="ratePS(${n},'Weak',this)">⚠️ Weak</button>
-        <button type="button" onclick="ratePS(${n},'Concerning',this)">🚩 Concerning</button>
-      </div>
+function renderPSReviewCards() {
+  const c = currentCandidate;
+  document.getElementById('ps-review-cards').innerHTML = PS_REVIEW_ITEMS.map((item, i) => {
+    const answer = item.getAnswer(c) || '';
+    const answerHTML = answer
+      ? `<div class="review-answer">${esc(answer)}</div>`
+      : `<div class="review-answer empty">(not provided on application)</div>`;
+    return `<div class="review-card" style="animation-delay:${i*0.03}s">
+      <div class="review-label">${esc(item.label)}</div>
+      ${answerHTML}
+      <label class="notes-label">Phone screen notes <span class="optional">(optional)</span></label>
+      <textarea name="${item.notesField}" placeholder="Anything new they shared, red flags, follow-ups, etc."></textarea>
     </div>`;
   }).join('');
-}
-
-function ratePS(n, rating, btn) {
-  psRatings[n] = rating;
-  btn.parentElement.querySelectorAll('button').forEach(b => b.classList.remove('selected'));
-  btn.classList.add('selected');
 }
 
 document.getElementById('ps-form').addEventListener('submit', async (e) => {
@@ -750,10 +772,8 @@ document.getElementById('ps-form').addEventListener('submit', async (e) => {
     ps_overallNotes: fd.get('ps_overallNotes') || '',
     ps_moveForward: fd.get('ps_moveForward')
   };
-  PS_QUESTIONS.forEach((q, i) => {
-    const n = i + 1;
-    data['ps_q'+n+'_answer'] = fd.get('ps_q'+n+'_answer') || '';
-    data['ps_q'+n+'_rating'] = psRatings[n] || '';
+  PS_REVIEW_ITEMS.forEach(item => {
+    data[item.notesField] = fd.get(item.notesField) || '';
   });
   try {
     const params = new URLSearchParams(data);
@@ -766,6 +786,7 @@ document.getElementById('ps-form').addEventListener('submit', async (e) => {
   }
 });
 
+// ─── IN-PERSON ───
 function startInPerson() {
   if (!currentCandidate) return;
   showView('inperson');
@@ -849,6 +870,7 @@ document.getElementById('ip-form').addEventListener('submit', async (e) => {
   }
 });
 
+// ─── Scheduling ───
 function closeModal(id) { document.getElementById(id).style.display = 'none'; }
 
 function openPhoneScreenModal() {
