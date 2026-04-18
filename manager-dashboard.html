@@ -811,61 +811,41 @@ function renderIPSummary() {
   const summaryEl = document.getElementById('ip-summary');
   const hasPS = !!c.phoneScreenerName;
 
-  // Application rows
-  const appRows = [
-    ['College / Other Job',            joinYesNo(c.collegeOrOtherJob, c.collegeOrOtherJobDesc)],
-    ['Open Availability',              joinYesNo(c.openAvailability, c.openAvailabilityDesc)],
-    ['When Can Start',                 formatDate(c.startDate)],
-    ['Role Fit ($36–40k, Full-time)',  joinYesNo(c.roleFit, c.roleFitDiscussDesc)],
-    ['Most Recent Job',                [c.recentJobTitle, c.recentJobCompany].filter(Boolean).join(' @ ')],
-    ['Day-to-Day',                     c.recentJobDayToDay],
-    ['Most Recent Pay',                c.recentPay],
-    ['Why Leaving',                    c.whyLeaving],
-    ['Inventory Experience',           joinYesNo(c.inventoryExp, c.inventoryExpDesc)],
-    ['Scheduling Experience',          joinYesNo(c.schedulingExp, c.schedulingExpDesc)],
-    ['Hiring / Firing Experience',     joinYesNo(c.hireFireExp, c.hireFireExpDesc)],
-    ['Training Experience',            joinYesNo(c.trainingExp, c.trainingExpDesc)],
-    ['Customer Service Experience',    joinYesNo(c.customerServiceExp, c.customerServiceExpDesc)],
-    ['Anything Else',                  c.notes]
-  ];
-  const appHTML = appRows.map(([label, val]) =>
-    val ? `<div class="data-row"><span class="label">${esc(label)}</span><span class="value">${esc(val)}</span></div>` : ''
-  ).join('');
-
-  // Phone screen rows
-  let psHTML = '';
-  if (hasPS) {
-    psHTML += `<div class="data-row"><span class="label">Interviewer</span><span class="value">${esc(c.phoneScreenerName)}</span></div>`;
-    psHTML += `<div class="data-row"><span class="label">Move Forward?</span><span class="value" style="font-weight:700">${esc(c.ps_moveForward||'—')}</span></div>`;
-    if (c.ps_overallNotes) psHTML += `<div class="data-row"><span class="label">Overall Vibe</span><span class="value">${esc(c.ps_overallNotes)}</span></div>`;
-    PS_REVIEW_ITEMS.forEach(item => {
-      const notes = c[item.notesField];
-      if (notes) {
-        psHTML += `<div style="padding:10px 0;border-bottom:1px solid var(--border);">
-          <div style="font-size:12px;color:var(--text-soft);font-weight:700;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">${esc(item.label)}</div>
-          <div style="font-size:14px;white-space:pre-wrap;">${esc(notes)}</div>
-        </div>`;
-      }
-    });
-  } else {
-    psHTML = `<div class="empty-state" style="padding:20px;"><p>No phone screen completed yet.</p></div>`;
+  // If no phone screen, hide the summary section entirely
+  if (!hasPS) {
+    summaryEl.innerHTML = '';
+    return;
   }
+
+  // Header rows (interviewer, decision, vibe)
+  let headerHTML = `<div class="data-row"><span class="label">Interviewer</span><span class="value">${esc(c.phoneScreenerName)}</span></div>`;
+  headerHTML += `<div class="data-row"><span class="label">Move Forward?</span><span class="value" style="font-weight:700">${esc(c.ps_moveForward||'—')}</span></div>`;
+  if (c.ps_overallNotes) headerHTML += `<div class="data-row"><span class="label">Overall Vibe</span><span class="value">${esc(c.ps_overallNotes)}</span></div>`;
+
+  // Review items — show each PS_REVIEW_ITEM with application answer + PS notes (if any)
+  let itemsHTML = '';
+  PS_REVIEW_ITEMS.forEach(item => {
+    const answer = item.getAnswer(c) || '';
+    const notes = c[item.notesField] || '';
+    if (answer || notes) {
+      itemsHTML += `<div style="padding:14px 0;border-bottom:1px solid var(--border);">
+        <div style="font-size:12px;color:var(--text-soft);font-weight:700;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;">${esc(item.label)}</div>
+        ${answer?`<div style="font-size:13px;color:#666;margin-bottom:${notes?'8px':'0'};white-space:pre-wrap;"><em style="color:var(--text-soft);">📝 Applied:</em> ${esc(answer)}</div>`:''}
+        ${notes?`<div style="font-size:14px;color:#333;background:var(--purple-light);padding:10px 12px;border-radius:6px;border-left:3px solid var(--purple);white-space:pre-wrap;"><strong style="color:var(--purple);">💬 Phone screen:</strong> ${esc(notes)}</div>`:''}
+      </div>`;
+    }
+  });
 
   summaryEl.innerHTML = `
     <div class="card" style="padding:0;overflow:hidden;">
-      <button type="button" onclick="toggleSummary('app')" style="width:100%;padding:18px 24px;background:var(--blue-light);border:none;text-align:left;cursor:pointer;font-family:'DM Sans',sans-serif;display:flex;justify-content:space-between;align-items:center;font-size:15px;font-weight:700;color:var(--blue);">
-        <span>📝 Application Summary</span>
-        <span id="summary-app-arrow" style="transition:transform 0.2s;">▼</span>
+      <button type="button" onclick="toggleSummary('combined')" style="width:100%;padding:18px 24px;background:var(--purple-light);border:none;text-align:left;cursor:pointer;font-family:'DM Sans',sans-serif;display:flex;justify-content:space-between;align-items:center;font-size:15px;font-weight:700;color:var(--purple);">
+        <span>📞 Phone Screen &amp; Application Summary ✓</span>
+        <span id="summary-combined-arrow" style="transition:transform 0.2s;">▼</span>
       </button>
-      <div id="summary-app-body" style="display:none;padding:18px 24px;">${appHTML}</div>
-    </div>
-
-    <div class="card" style="padding:0;overflow:hidden;">
-      <button type="button" onclick="toggleSummary('ps')" style="width:100%;padding:18px 24px;background:var(--purple-light);border:none;text-align:left;cursor:pointer;font-family:'DM Sans',sans-serif;display:flex;justify-content:space-between;align-items:center;font-size:15px;font-weight:700;color:var(--purple);">
-        <span>📞 Phone Screen Summary${hasPS?' ✓':''}</span>
-        <span id="summary-ps-arrow" style="transition:transform 0.2s;">▼</span>
-      </button>
-      <div id="summary-ps-body" style="display:none;padding:18px 24px;">${psHTML}</div>
+      <div id="summary-combined-body" style="display:none;padding:18px 24px;">
+        ${headerHTML}
+        <div style="margin-top:8px;">${itemsHTML}</div>
+      </div>
     </div>
   `;
 }
