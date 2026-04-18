@@ -184,7 +184,6 @@ textarea { resize: vertical; min-height: 70px; }
 
 <div class="toast" id="toast"></div>
 
-<!-- LOGIN -->
 <div id="view-login" class="view active">
   <div class="container">
     <div class="login-card card">
@@ -199,7 +198,6 @@ textarea { resize: vertical; min-height: 70px; }
   </div>
 </div>
 
-<!-- DASHBOARD -->
 <div id="view-dashboard" class="view">
   <div class="container wide">
     <div class="page-header" style="text-align:left; padding-bottom:20px;">
@@ -229,7 +227,6 @@ textarea { resize: vertical; min-height: 70px; }
   </div>
 </div>
 
-<!-- PROFILE -->
 <div id="view-profile" class="view">
   <div class="container">
     <button class="profile-back" onclick="showView('dashboard')">← Back to Dashboard</button>
@@ -237,7 +234,6 @@ textarea { resize: vertical; min-height: 70px; }
   </div>
 </div>
 
-<!-- PHONE SCREEN -->
 <div id="view-phonescreen" class="view">
   <div class="container">
     <button class="profile-back" id="ps-back-btn">← Back to Profile</button>
@@ -250,17 +246,15 @@ textarea { resize: vertical; min-height: 70px; }
         <div class="card-title"><span class="icon" style="background:var(--accent-light);color:var(--accent)">👤</span> Interviewer</div>
         <div class="field">
           <label>Your Name *</label>
-          <input type="text" name="phoneScreenerName" required placeholder="Who is conducting this phone screen?">
+          <input type="text" name="phoneScreenerName" required>
         </div>
       </div>
-
       <div id="ps-questions"></div>
-
       <div class="card">
         <div class="card-title"><span class="icon" style="background:var(--green-light);color:var(--green)">🎯</span> Overall</div>
         <div class="field">
           <label>Overall notes <span class="optional">(optional)</span></label>
-          <textarea name="ps_overallNotes" placeholder="Any additional thoughts about this phone screen"></textarea>
+          <textarea name="ps_overallNotes"></textarea>
         </div>
         <div class="field" style="margin-top:12px">
           <label>Move forward to in-person interview? *</label>
@@ -271,13 +265,11 @@ textarea { resize: vertical; min-height: 70px; }
           </div>
         </div>
       </div>
-
       <button type="submit" class="btn btn-primary" id="ps-submit-btn">Submit Phone Screen</button>
     </form>
   </div>
 </div>
 
-<!-- IN-PERSON -->
 <div id="view-inperson" class="view">
   <div class="container">
     <button class="profile-back" id="ip-back-btn">← Back to Profile</button>
@@ -290,12 +282,10 @@ textarea { resize: vertical; min-height: 70px; }
         <div class="card-title"><span class="icon" style="background:var(--accent-light);color:var(--accent)">👤</span> Interviewer</div>
         <div class="field">
           <label>Your Name *</label>
-          <input type="text" name="inPersonInterviewerName" required placeholder="Who is conducting this interview?">
+          <input type="text" name="inPersonInterviewerName" required>
         </div>
       </div>
-
       <div id="ip-questions"></div>
-
       <div class="card">
         <div class="card-title"><span class="icon" style="background:var(--yellow-light);color:var(--yellow)">⭐</span> Overall Grades (0–5)</div>
         <div class="overall-grade">
@@ -307,7 +297,6 @@ textarea { resize: vertical; min-height: 70px; }
           <div class="grade-item"><span class="label">Integrity</span><div class="grade-dots" data-grade="gradeIntegrity"></div></div>
         </div>
       </div>
-
       <div class="card">
         <div class="card-title"><span class="icon" style="background:var(--green-light);color:var(--green)">🤝</span> Final Assessment</div>
         <div class="field">
@@ -344,22 +333,20 @@ textarea { resize: vertical; min-height: 70px; }
         </div>
         <div class="field" style="margin-top:12px">
           <label>Overall notes / conditions <span class="optional">(optional)</span></label>
-          <textarea name="ip_overallNotes" placeholder="Any other thoughts"></textarea>
+          <textarea name="ip_overallNotes"></textarea>
         </div>
       </div>
-
       <button type="submit" class="btn btn-primary" id="ip-submit-btn">Submit In-Person Interview</button>
     </form>
   </div>
 </div>
 
-<!-- SCHEDULE MODALS -->
 <div id="schedule-ps-modal" class="modal-overlay" style="display:none" onclick="if(event.target===this)closeModal('schedule-ps-modal')">
   <div class="modal">
     <h3>📞 Schedule Phone Screen</h3>
     <div class="field"><label>Date *</label><input type="date" id="ps-date" required></div>
     <div class="field"><label>Time *</label><input type="time" id="ps-time" required></div>
-    <div class="field"><label>Notes <span class="optional">(optional)</span></label><input type="text" id="ps-notes" placeholder="e.g. They prefer morning calls"></div>
+    <div class="field"><label>Notes <span class="optional">(optional)</span></label><input type="text" id="ps-notes"></div>
     <div class="modal-actions">
       <button class="btn btn-secondary" onclick="closeModal('schedule-ps-modal')">Cancel</button>
       <button class="btn btn-primary" style="width:auto;padding:12px 24px" onclick="savePhoneScreenSchedule()">Save</button>
@@ -372,7 +359,7 @@ textarea { resize: vertical; min-height: 70px; }
     <h3>🤝 Schedule In-Person Interview</h3>
     <div class="field"><label>Date *</label><input type="date" id="ip-date" required></div>
     <div class="field"><label>Time *</label><input type="time" id="ip-time" required></div>
-    <div class="field"><label>Notes <span class="optional">(optional)</span></label><input type="text" id="ip-notes" placeholder="e.g. Meet at the store"></div>
+    <div class="field"><label>Notes <span class="optional">(optional)</span></label><input type="text" id="ip-notes"></div>
     <div class="modal-actions">
       <button class="btn btn-secondary" onclick="closeModal('schedule-ip-modal')">Cancel</button>
       <button class="btn btn-primary" style="width:auto;padding:12px 24px" onclick="saveInPersonSchedule()">Save</button>
@@ -601,12 +588,14 @@ function renderProfile(c) {
       <div class="data-row"><span class="label">Open Availability</span><span class="value">${esc(c.openAvailability||'—')}${c.openAvailabilityDesc?' — '+esc(c.openAvailabilityDesc):''}</span></div>
       <div class="data-row"><span class="label">Can Start</span><span class="value">${formatDate(c.startDate)||'—'}</span></div>
       <div class="data-row"><span class="label">Full-time $36–40k/yr fit</span><span class="value">${esc(c.roleFit||'—')}</span></div>
-      ${c.recentJob?`<div class="data-row"><span class="label">Most Recent Job</span><span class="value">${esc(c.recentJob)}</span></div>`:''}
+      ${c.recentJobCompany?`<div class="data-row"><span class="label">Most Recent Company</span><span class="value">${esc(c.recentJobCompany)}</span></div>`:''}
+      ${c.recentJobTitle?`<div class="data-row"><span class="label">Most Recent Title</span><span class="value">${esc(c.recentJobTitle)}</span></div>`:''}
+      ${c.recentJobDayToDay?`<div class="data-row"><span class="label">Day-to-Day</span><span class="value">${esc(c.recentJobDayToDay)}</span></div>`:''}
       ${c.recentPay?`<div class="data-row"><span class="label">Most Recent Pay</span><span class="value">${esc(c.recentPay)}</span></div>`:''}
       ${c.whyLeaving?`<div class="data-row"><span class="label">Why Leaving</span><span class="value">${esc(c.whyLeaving)}</span></div>`:''}
-      ${c.mgmtExpSummary?`<div class="data-row"><span class="label">Mgmt Experience</span><span class="value">${esc(c.mgmtExpSummary)}</span></div>`:''}
       <div class="data-row"><span class="label">Inventory Exp</span><span class="value">${esc(c.inventoryExp||'—')}${c.inventoryExpDesc?' — '+esc(c.inventoryExpDesc):''}</span></div>
       <div class="data-row"><span class="label">Scheduling Exp</span><span class="value">${esc(c.schedulingExp||'—')}${c.schedulingExpDesc?' — '+esc(c.schedulingExpDesc):''}</span></div>
+      <div class="data-row"><span class="label">Hire/Fire Exp</span><span class="value">${esc(c.hireFireExp||'—')}${c.hireFireExpDesc?' — '+esc(c.hireFireExpDesc):''}</span></div>
       ${c.notes?`<div class="data-row"><span class="label">Notes</span><span class="value">${esc(c.notes)}</span></div>`:''}
     </div>
 
@@ -729,7 +718,7 @@ function renderPSQuestions() {
     const n = i + 1;
     return `<div class="question-card" style="animation-delay:${i*0.05}s">
       <div class="question">${n}. ${esc(q)}</div>
-      <textarea name="ps_q${n}_answer" placeholder="Type their answer here..."></textarea>
+      <textarea name="ps_q${n}_answer"></textarea>
       <div class="rating-btns" data-ps-q="${n}">
         <button type="button" onclick="ratePS(${n},'Strong',this)">✅ Strong</button>
         <button type="button" onclick="ratePS(${n},'Okay',this)">👍 Okay</button>
@@ -793,7 +782,7 @@ function renderIPQuestions() {
     const n = i + 1;
     return `<div class="question-card" style="animation-delay:${i*0.05}s">
       <div class="question">${n}. ${esc(q)}</div>
-      <textarea name="ip_q${n}_answer" placeholder="Type their answer here..."></textarea>
+      <textarea name="ip_q${n}_answer"></textarea>
       <div class="rating-btns" data-ip-q="${n}">
         <button type="button" onclick="rateIP(${n},'Strong',this)">✅ Strong</button>
         <button type="button" onclick="rateIP(${n},'Okay',this)">👍 Okay</button>
