@@ -143,6 +143,9 @@ textarea { resize: vertical; min-height: 70px; }
             <label><input type="radio" name="roleFit" value="Let's discuss"> 💬 Let's discuss</label>
             <label><input type="radio" name="roleFit" value="No"> ❌ No</label>
           </div>
+          <div class="reveal" id="reveal-roleFit">
+            <textarea name="roleFitDiscussDesc" placeholder="What would you like to discuss?"></textarea>
+          </div>
         </div>
       </div>
 
@@ -212,6 +215,28 @@ textarea { resize: vertical; min-height: 70px; }
             <textarea name="hireFireExpDesc" placeholder="Please describe if you have experience having difficult conversations with employees about letting them go"></textarea>
           </div>
         </div>
+
+        <div class="field" style="margin-top:16px">
+          <label>Do you have experience training employees? *</label>
+          <div class="radio-group">
+            <label><input type="radio" name="trainingExp" value="Yes" required> Yes</label>
+            <label><input type="radio" name="trainingExp" value="No"> No</label>
+          </div>
+          <div class="reveal" id="reveal-trainingExp">
+            <textarea name="trainingExpDesc" placeholder="Please describe your training experience — how many employees, what types of roles, and your general approach"></textarea>
+          </div>
+        </div>
+
+        <div class="field" style="margin-top:16px">
+          <label>Do you have experience providing strong customer service and resolving customer complaints? *</label>
+          <div class="radio-group">
+            <label><input type="radio" name="customerServiceExp" value="Yes" required> Yes</label>
+            <label><input type="radio" name="customerServiceExp" value="No"> No</label>
+          </div>
+          <div class="reveal" id="reveal-customerServiceExp">
+            <textarea name="customerServiceExpDesc" placeholder="Please describe"></textarea>
+          </div>
+        </div>
       </div>
 
       <!-- Notes -->
@@ -268,11 +293,14 @@ function setupReveal(name, showValues) {
     });
   });
 }
-setupReveal('collegeOrOtherJob', ['Yes']);
-setupReveal('openAvailability',  ['Partial','No']);
-setupReveal('inventoryExp',      ['Yes']);
-setupReveal('schedulingExp',     ['Yes']);
-setupReveal('hireFireExp',       ['Yes']);
+setupReveal('collegeOrOtherJob',   ['Yes']);
+setupReveal('openAvailability',    ['Partial','No']);
+setupReveal('roleFit',             ["Let's discuss"]);
+setupReveal('inventoryExp',        ['Yes']);
+setupReveal('schedulingExp',       ['Yes']);
+setupReveal('hireFireExp',         ['Yes']);
+setupReveal('trainingExp',         ['Yes']);
+setupReveal('customerServiceExp',  ['Yes']);
 
 document.getElementById('apply-form').addEventListener('submit', async (e) => {
   e.preventDefault();
