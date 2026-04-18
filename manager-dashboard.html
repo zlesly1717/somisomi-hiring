@@ -587,7 +587,7 @@ function renderProfile(c) {
       <div class="data-row"><span class="label">College / Other Job</span><span class="value">${esc(c.collegeOrOtherJob||'—')}${c.collegeOrOtherJobDesc?' — '+esc(c.collegeOrOtherJobDesc):''}</span></div>
       <div class="data-row"><span class="label">Open Availability</span><span class="value">${esc(c.openAvailability||'—')}${c.openAvailabilityDesc?' — '+esc(c.openAvailabilityDesc):''}</span></div>
       <div class="data-row"><span class="label">Can Start</span><span class="value">${formatDate(c.startDate)||'—'}</span></div>
-      <div class="data-row"><span class="label">Full-time $36–40k/yr fit</span><span class="value">${esc(c.roleFit||'—')}</span></div>
+      <div class="data-row"><span class="label">Full-time $36–40k/yr fit</span><span class="value">${esc(c.roleFit||'—')}${c.roleFitDiscussDesc?' — '+esc(c.roleFitDiscussDesc):''}</span></div>
       ${c.recentJobCompany?`<div class="data-row"><span class="label">Most Recent Company</span><span class="value">${esc(c.recentJobCompany)}</span></div>`:''}
       ${c.recentJobTitle?`<div class="data-row"><span class="label">Most Recent Title</span><span class="value">${esc(c.recentJobTitle)}</span></div>`:''}
       ${c.recentJobDayToDay?`<div class="data-row"><span class="label">Day-to-Day</span><span class="value">${esc(c.recentJobDayToDay)}</span></div>`:''}
@@ -596,6 +596,8 @@ function renderProfile(c) {
       <div class="data-row"><span class="label">Inventory Exp</span><span class="value">${esc(c.inventoryExp||'—')}${c.inventoryExpDesc?' — '+esc(c.inventoryExpDesc):''}</span></div>
       <div class="data-row"><span class="label">Scheduling Exp</span><span class="value">${esc(c.schedulingExp||'—')}${c.schedulingExpDesc?' — '+esc(c.schedulingExpDesc):''}</span></div>
       <div class="data-row"><span class="label">Hire/Fire Exp</span><span class="value">${esc(c.hireFireExp||'—')}${c.hireFireExpDesc?' — '+esc(c.hireFireExpDesc):''}</span></div>
+      <div class="data-row"><span class="label">Training Exp</span><span class="value">${esc(c.trainingExp||'—')}${c.trainingExpDesc?' — '+esc(c.trainingExpDesc):''}</span></div>
+      <div class="data-row"><span class="label">Customer Service Exp</span><span class="value">${esc(c.customerServiceExp||'—')}${c.customerServiceExpDesc?' — '+esc(c.customerServiceExpDesc):''}</span></div>
       ${c.notes?`<div class="data-row"><span class="label">Notes</span><span class="value">${esc(c.notes)}</span></div>`:''}
     </div>
 
