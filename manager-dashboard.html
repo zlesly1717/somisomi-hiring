@@ -302,6 +302,7 @@ textarea { resize: vertical; min-height: 70px; }
           <input type="text" name="inPersonInterviewerName" required>
         </div>
       </div>
+      <div id="ip-summary"></div>
       <div id="ip-questions"></div>
       <div class="card">
         <div class="card-title"><span class="icon" style="background:var(--yellow-light);color:var(--yellow)">⭐</span> Overall Grades (0–5)</div>
@@ -409,12 +410,16 @@ const PS_REVIEW_ITEMS = [
 ];
 
 const IP_QUESTIONS = [
-  "Scheduling — have you built staff schedules before? What software or process did you use?",
-  "Inventory — have you managed inventory before? What software or process did you use?",
-  "Hiring — have you interviewed and hired people before? Walk me through your process.",
-  "Firing — have you had to let someone go? What was the situation and how did you handle it?",
-  "Payroll — have you run payroll before? What system/software?",
-  "Team management — tell me about your biggest team management challenge and how you handled it."
+  "An employee calls out last minute and another doesn't show up — how do you handle the shift?",
+  "An employee is repeatedly late and does not bring it up at all (does not apologize or try to address it). How do you address it, and when would you escalate to termination?",
+  "Walk me through exactly how you would terminate an employee.",
+  "If one employee is noticeably underperforming compared to the rest of the team, how do you handle it?",
+  "How do you handle employees who have bad attitudes, gossip, or start bringing down the team?",
+  "We received a 1-star review and the customer reached out personally to you explaining that an employee was very rude to them. How would you handle that?",
+  "How would you handle a difficult situation involving customers — like someone intoxicated, disruptive, or unsafe behavior in the store?",
+  "How do you manage situations where employees are friends, dating, or crossing professional boundaries at work?",
+  "If something goes wrong during a shift — like equipment breaking, AC going out, or a maintenance issue — what's your approach?",
+  "How do you balance taking care of customers (like replacing dropped items) while also protecting the business from being taken advantage of?"
 ];
 
 function joinYesNo(yesNoValue, desc) {
@@ -796,8 +801,81 @@ function startInPerson() {
   document.getElementById('ip-form').reset();
   const btn = document.getElementById('ip-submit-btn');
   btn.disabled = false; btn.textContent = 'Submit In-Person Interview';
+  renderIPSummary();
   renderIPQuestions();
   renderGradeDots();
+}
+
+function renderIPSummary() {
+  const c = currentCandidate;
+  const summaryEl = document.getElementById('ip-summary');
+  const hasPS = !!c.phoneScreenerName;
+
+  // Application rows
+  const appRows = [
+    ['College / Other Job',            joinYesNo(c.collegeOrOtherJob, c.collegeOrOtherJobDesc)],
+    ['Open Availability',              joinYesNo(c.openAvailability, c.openAvailabilityDesc)],
+    ['When Can Start',                 formatDate(c.startDate)],
+    ['Role Fit ($36–40k, Full-time)',  joinYesNo(c.roleFit, c.roleFitDiscussDesc)],
+    ['Most Recent Job',                [c.recentJobTitle, c.recentJobCompany].filter(Boolean).join(' @ ')],
+    ['Day-to-Day',                     c.recentJobDayToDay],
+    ['Most Recent Pay',                c.recentPay],
+    ['Why Leaving',                    c.whyLeaving],
+    ['Inventory Experience',           joinYesNo(c.inventoryExp, c.inventoryExpDesc)],
+    ['Scheduling Experience',          joinYesNo(c.schedulingExp, c.schedulingExpDesc)],
+    ['Hiring / Firing Experience',     joinYesNo(c.hireFireExp, c.hireFireExpDesc)],
+    ['Training Experience',            joinYesNo(c.trainingExp, c.trainingExpDesc)],
+    ['Customer Service Experience',    joinYesNo(c.customerServiceExp, c.customerServiceExpDesc)],
+    ['Anything Else',                  c.notes]
+  ];
+  const appHTML = appRows.map(([label, val]) =>
+    val ? `<div class="data-row"><span class="label">${esc(label)}</span><span class="value">${esc(val)}</span></div>` : ''
+  ).join('');
+
+  // Phone screen rows
+  let psHTML = '';
+  if (hasPS) {
+    psHTML += `<div class="data-row"><span class="label">Interviewer</span><span class="value">${esc(c.phoneScreenerName)}</span></div>`;
+    psHTML += `<div class="data-row"><span class="label">Move Forward?</span><span class="value" style="font-weight:700">${esc(c.ps_moveForward||'—')}</span></div>`;
+    if (c.ps_overallNotes) psHTML += `<div class="data-row"><span class="label">Overall Vibe</span><span class="value">${esc(c.ps_overallNotes)}</span></div>`;
+    PS_REVIEW_ITEMS.forEach(item => {
+      const notes = c[item.notesField];
+      if (notes) {
+        psHTML += `<div style="padding:10px 0;border-bottom:1px solid var(--border);">
+          <div style="font-size:12px;color:var(--text-soft);font-weight:700;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">${esc(item.label)}</div>
+          <div style="font-size:14px;white-space:pre-wrap;">${esc(notes)}</div>
+        </div>`;
+      }
+    });
+  } else {
+    psHTML = `<div class="empty-state" style="padding:20px;"><p>No phone screen completed yet.</p></div>`;
+  }
+
+  summaryEl.innerHTML = `
+    <div class="card" style="padding:0;overflow:hidden;">
+      <button type="button" onclick="toggleSummary('app')" style="width:100%;padding:18px 24px;background:var(--blue-light);border:none;text-align:left;cursor:pointer;font-family:'DM Sans',sans-serif;display:flex;justify-content:space-between;align-items:center;font-size:15px;font-weight:700;color:var(--blue);">
+        <span>📝 Application Summary</span>
+        <span id="summary-app-arrow" style="transition:transform 0.2s;">▼</span>
+      </button>
+      <div id="summary-app-body" style="display:none;padding:18px 24px;">${appHTML}</div>
+    </div>
+
+    <div class="card" style="padding:0;overflow:hidden;">
+      <button type="button" onclick="toggleSummary('ps')" style="width:100%;padding:18px 24px;background:var(--purple-light);border:none;text-align:left;cursor:pointer;font-family:'DM Sans',sans-serif;display:flex;justify-content:space-between;align-items:center;font-size:15px;font-weight:700;color:var(--purple);">
+        <span>📞 Phone Screen Summary${hasPS?' ✓':''}</span>
+        <span id="summary-ps-arrow" style="transition:transform 0.2s;">▼</span>
+      </button>
+      <div id="summary-ps-body" style="display:none;padding:18px 24px;">${psHTML}</div>
+    </div>
+  `;
+}
+
+function toggleSummary(which) {
+  const body = document.getElementById('summary-' + which + '-body');
+  const arrow = document.getElementById('summary-' + which + '-arrow');
+  const isOpen = body.style.display !== 'none';
+  body.style.display = isOpen ? 'none' : 'block';
+  arrow.style.transform = isOpen ? 'rotate(0)' : 'rotate(180deg)';
 }
 
 function renderIPQuestions() {
@@ -805,7 +883,9 @@ function renderIPQuestions() {
     const n = i + 1;
     return `<div class="question-card" style="animation-delay:${i*0.05}s">
       <div class="question">${n}. ${esc(q)}</div>
-      <textarea name="ip_q${n}_answer"></textarea>
+      <label class="notes-label" style="font-size:12px;font-weight:600;color:var(--text-soft);margin-bottom:4px;display:block;">Your notes</label>
+      <textarea name="ip_q${n}_answer" placeholder="What they said, examples given, red flags, or things that stood out"></textarea>
+      <label class="notes-label" style="font-size:12px;font-weight:600;color:var(--text-soft);margin:8px 0 4px;display:block;">Rating</label>
       <div class="rating-btns" data-ip-q="${n}">
         <button type="button" onclick="rateIP(${n},'Strong',this)">✅ Strong</button>
         <button type="button" onclick="rateIP(${n},'Okay',this)">👍 Okay</button>
