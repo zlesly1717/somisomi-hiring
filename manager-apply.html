@@ -81,7 +81,6 @@ textarea { resize: vertical; min-height: 70px; }
 
     <form id="apply-form">
 
-      <!-- Contact -->
       <div class="card">
         <div class="card-title"><span class="icon" style="background:var(--accent-light);color:var(--accent)">👤</span> Contact Information</div>
         <div class="field">
@@ -100,10 +99,8 @@ textarea { resize: vertical; min-height: 70px; }
         </div>
       </div>
 
-      <!-- Availability -->
       <div class="card">
         <div class="card-title"><span class="icon" style="background:var(--blue-light);color:var(--blue)">📅</span> Availability</div>
-
         <div class="field">
           <label>Are you currently in college or do you have another job? *</label>
           <div class="radio-group">
@@ -114,7 +111,6 @@ textarea { resize: vertical; min-height: 70px; }
             <input type="text" name="collegeOrOtherJobDesc" placeholder="Please describe">
           </div>
         </div>
-
         <div class="field" style="margin-top:16px">
           <label>Do you have open availability? (including holidays/weekends?) *</label>
           <div class="radio-group">
@@ -126,14 +122,12 @@ textarea { resize: vertical; min-height: 70px; }
             <input type="text" name="openAvailabilityDesc" placeholder="Please describe your availability">
           </div>
         </div>
-
         <div class="field" style="margin-top:16px">
           <label>When could you start if made an offer? *</label>
           <input type="date" name="startDate" required>
         </div>
       </div>
 
-      <!-- Role Fit -->
       <div class="card">
         <div class="card-title"><span class="icon" style="background:var(--yellow-light);color:var(--yellow)">💼</span> Role Fit</div>
         <div class="field">
@@ -149,40 +143,32 @@ textarea { resize: vertical; min-height: 70px; }
         </div>
       </div>
 
-      <!-- Work History -->
       <div class="card">
         <div class="card-title"><span class="icon" style="background:var(--yellow-light);color:var(--yellow)">💼</span> Work History</div>
-
         <div class="field">
           <label>Most recent job company *</label>
           <input type="text" name="recentJobCompany" required>
         </div>
-
         <div class="field" style="margin-top:16px">
           <label>Most recent job title *</label>
           <input type="text" name="recentJobTitle" required>
         </div>
-
         <div class="field" style="margin-top:16px">
           <label>Please describe your day-to-day *</label>
           <textarea name="recentJobDayToDay" required></textarea>
         </div>
-
         <div class="field" style="margin-top:16px">
           <label>Most recent pay in that job *</label>
           <input type="text" name="recentPay" required>
         </div>
-
         <div class="field" style="margin-top:16px">
           <label>Why are you leaving your current (or most recent) role? *</label>
           <textarea name="whyLeaving" required></textarea>
         </div>
       </div>
 
-      <!-- Specific Experience -->
       <div class="card">
         <div class="card-title"><span class="icon" style="background:var(--green-light);color:var(--green)">✅</span> Specific Experience</div>
-
         <div class="field">
           <label>Inventory experience? *</label>
           <div class="radio-group">
@@ -193,7 +179,6 @@ textarea { resize: vertical; min-height: 70px; }
             <textarea name="inventoryExpDesc" placeholder="Please describe cadence and what software did you use? Did you also order the inventory from vendors?"></textarea>
           </div>
         </div>
-
         <div class="field" style="margin-top:16px">
           <label>Scheduling experience? *</label>
           <div class="radio-group">
@@ -204,7 +189,6 @@ textarea { resize: vertical; min-height: 70px; }
             <textarea name="schedulingExpDesc" placeholder="Please describe how many employees you managed and what software you used"></textarea>
           </div>
         </div>
-
         <div class="field" style="margin-top:16px">
           <label>Hiring / firing experience? *</label>
           <div class="radio-group">
@@ -215,7 +199,6 @@ textarea { resize: vertical; min-height: 70px; }
             <textarea name="hireFireExpDesc" placeholder="Please describe if you have experience having difficult conversations with employees about letting them go"></textarea>
           </div>
         </div>
-
         <div class="field" style="margin-top:16px">
           <label>Do you have experience training employees? *</label>
           <div class="radio-group">
@@ -226,7 +209,6 @@ textarea { resize: vertical; min-height: 70px; }
             <textarea name="trainingExpDesc" placeholder="Please describe your training experience — how many employees, what types of roles, and your general approach"></textarea>
           </div>
         </div>
-
         <div class="field" style="margin-top:16px">
           <label>Do you have experience providing strong customer service and resolving customer complaints? *</label>
           <div class="radio-group">
@@ -239,7 +221,6 @@ textarea { resize: vertical; min-height: 70px; }
         </div>
       </div>
 
-      <!-- Notes -->
       <div class="card">
         <div class="card-title"><span class="icon" style="background:var(--accent-light);color:var(--accent)">📝</span> Anything Else</div>
         <div class="field">
@@ -315,11 +296,9 @@ document.getElementById('apply-form').addEventListener('submit', async (e) => {
   e.preventDefault();
   const btn = document.getElementById('apply-btn');
   btn.disabled = true; btn.textContent = 'Submitting...';
-
   const fd = new FormData(e.target);
   const data = { type: 'application' };
   for (const [key, val] of fd.entries()) data[key] = val;
-
   try {
     await fetch(CONFIG.API_URL, {
       method: 'POST', mode: 'no-cors',
