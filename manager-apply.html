@@ -86,16 +86,16 @@ textarea { resize: vertical; min-height: 70px; }
         <div class="card-title"><span class="icon" style="background:var(--accent-light);color:var(--accent)">👤</span> Contact Information</div>
         <div class="field">
           <label>Full Name *</label>
-          <input type="text" name="name" required placeholder="First and Last">
+          <input type="text" name="name" required>
         </div>
         <div class="row row-2" style="margin-top:12px">
           <div class="field">
             <label>Email *</label>
-            <input type="email" name="email" required placeholder="you@email.com">
+            <input type="email" name="email" required>
           </div>
           <div class="field">
             <label>Phone Number *</label>
-            <input type="tel" name="phone" required placeholder="(000) 000-0000">
+            <input type="tel" name="phone" required>
           </div>
         </div>
       </div>
@@ -111,12 +111,12 @@ textarea { resize: vertical; min-height: 70px; }
             <label><input type="radio" name="collegeOrOtherJob" value="Yes"> Yes</label>
           </div>
           <div class="reveal" id="reveal-collegeOrOtherJob">
-            <input type="text" name="collegeOrOtherJobDesc" placeholder="Please describe (e.g. full-time student at ..., part-time job at ...)">
+            <input type="text" name="collegeOrOtherJobDesc" placeholder="Please describe">
           </div>
         </div>
 
         <div class="field" style="margin-top:16px">
-          <label>Open availability (able to work any day, any shift)? *</label>
+          <label>Do you have open availability? (including holidays/weekends?) *</label>
           <div class="radio-group">
             <label><input type="radio" name="openAvailability" value="Yes" required> Yes</label>
             <label><input type="radio" name="openAvailability" value="Partial"> Partial</label>
@@ -128,16 +128,16 @@ textarea { resize: vertical; min-height: 70px; }
         </div>
 
         <div class="field" style="margin-top:16px">
-          <label>When could you start? *</label>
+          <label>When could you start if made an offer? *</label>
           <input type="date" name="startDate" required>
         </div>
       </div>
 
-      <!-- Role Fit / Gatekeeper -->
+      <!-- Role Fit -->
       <div class="card">
         <div class="card-title"><span class="icon" style="background:var(--yellow-light);color:var(--yellow)">💼</span> Role Fit</div>
         <div class="field">
-          <label>Are you okay with full-time, open availability, and $36,000–$40,000/yr? *</label>
+          <label>This position is full-time, requires open availability, and is $36,000–$40,000/yr. Is this okay with you? *</label>
           <div class="radio-group">
             <label><input type="radio" name="roleFit" value="Yes" required> ✅ Yes</label>
             <label><input type="radio" name="roleFit" value="Let's discuss"> 💬 Let's discuss</label>
@@ -151,23 +151,28 @@ textarea { resize: vertical; min-height: 70px; }
         <div class="card-title"><span class="icon" style="background:var(--yellow-light);color:var(--yellow)">💼</span> Work History</div>
 
         <div class="field">
-          <label>Most recent job — what was your title, company, and day-to-day? *</label>
-          <textarea name="recentJob" required placeholder="e.g. Shift Lead at Starbucks — opened the store, ran morning rush, trained new hires, handled cash..."></textarea>
+          <label>Most recent job company *</label>
+          <input type="text" name="recentJobCompany" required>
         </div>
 
         <div class="field" style="margin-top:16px">
-          <label>Most recent pay in that job? *</label>
-          <input type="text" name="recentPay" required placeholder="e.g. $18/hr, or $45,000/yr salary">
+          <label>Most recent job title *</label>
+          <input type="text" name="recentJobTitle" required>
+        </div>
+
+        <div class="field" style="margin-top:16px">
+          <label>Please describe your day-to-day *</label>
+          <textarea name="recentJobDayToDay" required></textarea>
+        </div>
+
+        <div class="field" style="margin-top:16px">
+          <label>Most recent pay in that job *</label>
+          <input type="text" name="recentPay" required>
         </div>
 
         <div class="field" style="margin-top:16px">
           <label>Why are you leaving your current (or most recent) role? *</label>
-          <textarea name="whyLeaving" required placeholder="What's driving you to look for something new?"></textarea>
-        </div>
-
-        <div class="field" style="margin-top:16px">
-          <label>Management experience — summary of past management roles *</label>
-          <textarea name="mgmtExpSummary" required placeholder="Summarize your management background: roles, team sizes, how long, industries"></textarea>
+          <textarea name="whyLeaving" required></textarea>
         </div>
       </div>
 
@@ -182,7 +187,7 @@ textarea { resize: vertical; min-height: 70px; }
             <label><input type="radio" name="inventoryExp" value="No"> No</label>
           </div>
           <div class="reveal" id="reveal-inventoryExp">
-            <textarea name="inventoryExpDesc" placeholder="Please describe (software used, how long, scope)"></textarea>
+            <textarea name="inventoryExpDesc" placeholder="Please describe cadence and what software did you use? Did you also order the inventory from vendors?"></textarea>
           </div>
         </div>
 
@@ -193,7 +198,18 @@ textarea { resize: vertical; min-height: 70px; }
             <label><input type="radio" name="schedulingExp" value="No"> No</label>
           </div>
           <div class="reveal" id="reveal-schedulingExp">
-            <textarea name="schedulingExpDesc" placeholder="Please describe (software used, team size, how long)"></textarea>
+            <textarea name="schedulingExpDesc" placeholder="Please describe how many employees you managed and what software you used"></textarea>
+          </div>
+        </div>
+
+        <div class="field" style="margin-top:16px">
+          <label>Hiring / firing experience? *</label>
+          <div class="radio-group">
+            <label><input type="radio" name="hireFireExp" value="Yes" required> Yes</label>
+            <label><input type="radio" name="hireFireExp" value="No"> No</label>
+          </div>
+          <div class="reveal" id="reveal-hireFireExp">
+            <textarea name="hireFireExpDesc" placeholder="Please describe if you have experience having difficult conversations with employees about letting them go"></textarea>
           </div>
         </div>
       </div>
@@ -202,15 +218,16 @@ textarea { resize: vertical; min-height: 70px; }
       <div class="card">
         <div class="card-title"><span class="icon" style="background:var(--accent-light);color:var(--accent)">📝</span> Anything Else</div>
         <div class="field">
-          <label>Anything else you'd like us to know? <span class="optional">(optional)</span></label>
-          <textarea name="notes" placeholder="Tell us anything else you want us to know"></textarea>
+          <label>Anything else you'd like the hiring managers to know? <span class="optional">(optional)</span></label>
+          <textarea name="notes"></textarea>
         </div>
       </div>
 
       <div class="card">
         <div class="info-box">
           <strong>🍦 About the role</strong><br><br>
-          Store Manager for our Metropark Square SomiSomi location. Full-time (40 hrs/wk), salaried $36,000–$40,000 depending on experience. You'd be running the whole location — scheduling, inventory, hiring/firing, training, and daily operations.<br><br>
+          Store Manager for our Metropark Square SomiSomi location. Full-time (40 hrs/wk), salaried $36,000–$40,000 depending on experience.<br><br>
+          You'd be running the whole location — scheduling, inventory, hiring/firing, training, and daily operations.<br><br>
           <strong>Our motto:</strong> Be on time, ready to learn, and work with a positive attitude.
         </div>
       </div>
@@ -252,9 +269,10 @@ function setupReveal(name, showValues) {
   });
 }
 setupReveal('collegeOrOtherJob', ['Yes']);
-setupReveal('openAvailability',  ['No', 'Partial']);
+setupReveal('openAvailability',  ['Partial','No']);
 setupReveal('inventoryExp',      ['Yes']);
 setupReveal('schedulingExp',     ['Yes']);
+setupReveal('hireFireExp',       ['Yes']);
 
 document.getElementById('apply-form').addEventListener('submit', async (e) => {
   e.preventDefault();
