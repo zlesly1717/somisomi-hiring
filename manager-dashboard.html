@@ -386,6 +386,18 @@ textarea { resize: vertical; min-height: 70px; }
   </div>
 </div>
 
+<div id="reject-modal" class="modal-overlay" style="display:none" onclick="if(event.target===this)closeModal('reject-modal')">
+  <div class="modal">
+    <h3>❌ Reject Candidate</h3>
+    <div class="field"><label>Your Name *</label><input type="text" id="reject-name" required></div>
+    <div class="field"><label>Reason for rejection *</label><textarea id="reject-reason" placeholder="Why are you rejecting this candidate? (e.g. availability doesn't match, pay expectations too high, concerning attitude on call, etc.)" required style="min-height:90px;"></textarea></div>
+    <div class="modal-actions">
+      <button class="btn btn-secondary" onclick="closeModal('reject-modal')">Cancel</button>
+      <button class="btn btn-primary" style="width:auto;padding:12px 24px;background:var(--red);" onclick="saveRejection()">Reject</button>
+    </div>
+  </div>
+</div>
+
 <script>
 const CONFIG = {
   API_URL: 'https://script.google.com/macros/s/AKfycbwTO3hiqx-7JsoNGK80DB6DP1uK52lk4isrezT0JmnedMYaac1zhHpzkGG22A0KKxO8Ag/exec',
@@ -601,6 +613,13 @@ function renderProfile(c) {
       </select>
     </div>
 
+    ${c.status==='Rejected' && c.rejectionReason?`<div class="card" style="border-color:#f5b5b1; background:var(--red-light);">
+      <div class="card-title" style="color:var(--red)"><span class="icon" style="background:#fff;color:var(--red)">❌</span> Rejected</div>
+      <div class="data-row" style="border-color:#f5b5b1"><span class="label">Reason</span><span class="value">${esc(c.rejectionReason)}</span></div>
+      ${c.rejectedBy?`<div class="data-row" style="border-color:#f5b5b1"><span class="label">Rejected by</span><span class="value">${esc(c.rejectedBy)}</span></div>`:''}
+      ${c.rejectedAt?`<div class="data-row" style="border-color:#f5b5b1"><span class="label">On</span><span class="value">${formatDate(c.rejectedAt)}</span></div>`:''}
+    </div>`:''}
+
     ${c.phoneScreenDate?`<div class="card" style="border-color:#ddd0ff; background:var(--purple-light);">
       <div class="card-title" style="color:var(--purple)"><span class="icon" style="background:#fff;color:var(--purple)">📞</span> Phone Screen Scheduled</div>
       <div class="data-row" style="border-color:#ddd0ff"><span class="label">Date</span><span class="value">${formatDate(c.phoneScreenDate)}</span></div>
@@ -727,6 +746,13 @@ function showTab(which, btn) {
 
 async function updateStatus(status) {
   if (!status || !currentCandidate) return;
+  if (status === 'Rejected') {
+    document.getElementById('reject-name').value = '';
+    document.getElementById('reject-reason').value = '';
+    document.getElementById('reject-modal').style.display = 'flex';
+    setTimeout(() => document.getElementById('reject-name').focus(), 100);
+    return;
+  }
   try {
     const params = new URLSearchParams({ action:'updateStatus', row: currentCandidate.row, pin: CONFIG.DASHBOARD_PIN, status });
     await fetch(CONFIG.API_URL + '?' + params.toString());
@@ -734,6 +760,30 @@ async function updateStatus(status) {
     renderProfile(currentCandidate);
     showToast('Status updated to ' + status);
   } catch (err) { showToast('Error updating status'); }
+}
+
+async function saveRejection() {
+  const name = document.getElementById('reject-name').value.trim();
+  const reason = document.getElementById('reject-reason').value.trim();
+  if (!name) { showToast('Please enter your name'); return; }
+  if (!reason) { showToast('Please enter a reason for rejection'); return; }
+  try {
+    const params = new URLSearchParams({
+      action: 'rejectCandidate',
+      row: currentCandidate.row,
+      pin: CONFIG.DASHBOARD_PIN,
+      rejectionReason: reason,
+      rejectedBy: name
+    });
+    await fetch(CONFIG.API_URL + '?' + params.toString());
+    currentCandidate.status = 'Rejected';
+    currentCandidate.rejectionReason = reason;
+    currentCandidate.rejectedBy = name;
+    currentCandidate.rejectedAt = new Date().toISOString();
+    closeModal('reject-modal');
+    renderProfile(currentCandidate);
+    showToast('Candidate rejected');
+  } catch (err) { showToast('Error rejecting candidate'); }
 }
 
 // ─── PHONE SCREEN ───
