@@ -409,10 +409,27 @@ const PS_REVIEW_ITEMS = [
   { notesField: 'ps_collegeNotes',           label: 'College / Other Job',            getAnswer: c => joinYesNo(c.collegeOrOtherJob, c.collegeOrOtherJobDesc) },
   { notesField: 'ps_availabilityNotes',      label: 'Open Availability',              getAnswer: c => joinYesNo(c.openAvailability,  c.openAvailabilityDesc) },
   { notesField: 'ps_startDateNotes',         label: 'When Can They Start',            getAnswer: c => formatDate(c.startDate) },
-  { notesField: 'ps_roleFitNotes',           label: 'Role Fit ($36–40k, Full-time)',  getAnswer: c => joinYesNo(c.roleFit, c.roleFitDiscussDesc) },
-  { notesField: 'ps_recentJobNotes',         label: 'Most Recent Job',                getAnswer: c => [c.recentJobTitle, c.recentJobCompany].filter(Boolean).join(' @ ') + (c.recentJobDayToDay?'\n\n'+c.recentJobDayToDay:'') },
-  { notesField: 'ps_recentPayNotes',         label: 'Most Recent Pay',                getAnswer: c => c.recentPay },
-  { notesField: 'ps_whyLeavingNotes',        label: 'Why Leaving',                    getAnswer: c => c.whyLeaving },
+  { notesField: 'ps_roleFitNotes',           label: 'Role / Pay Fit',                 getAnswer: c => joinYesNo(c.roleFit, c.roleFitDiscussDesc) },
+  { notesField: 'ps_recentJobNotes',         label: 'Work History',                   getAnswer: c => {
+      // New format: branching
+      if (c.currentlyEmployed === 'Yes') {
+        const parts = [];
+        if (c.currentJobTitle || c.currentJobCompany) parts.push([c.currentJobTitle, c.currentJobCompany].filter(Boolean).join(' @ '));
+        if (c.currentJobDuration) parts.push('(' + c.currentJobDuration + ')');
+        let out = 'Currently employed: ' + parts.join(' ');
+        if (c.currentJobDayToDay) out += '\n\n' + c.currentJobDayToDay;
+        return out;
+      }
+      if (c.currentlyEmployed === 'No') {
+        let out = 'Not currently employed.\n\nMost recent: ' + [c.recentJobTitle, c.recentJobCompany].filter(Boolean).join(' @ ');
+        if (c.recentJobDayToDay) out += '\n\n' + c.recentJobDayToDay;
+        return out;
+      }
+      // Old format fallback
+      return [c.recentJobTitle, c.recentJobCompany].filter(Boolean).join(' @ ') + (c.recentJobDayToDay?'\n\n'+c.recentJobDayToDay:'');
+    } },
+  { notesField: 'ps_recentPayNotes',         label: 'Pay',                            getAnswer: c => c.currentPay || c.recentPay },
+  { notesField: 'ps_whyLeavingNotes',        label: 'Why Leaving / Why Left',         getAnswer: c => c.whyLookingToLeave || c.whyLeftRecentJob || c.whyLeaving },
   { notesField: 'ps_inventoryNotes',         label: 'Inventory Experience',           getAnswer: c => joinYesNo(c.inventoryExp, c.inventoryExpDesc) },
   { notesField: 'ps_schedulingNotes',        label: 'Scheduling Experience',          getAnswer: c => joinYesNo(c.schedulingExp, c.schedulingExpDesc) },
   { notesField: 'ps_hireFireNotes',          label: 'Hiring / Firing Experience',     getAnswer: c => joinYesNo(c.hireFireExp, c.hireFireExpDesc) },
@@ -438,6 +455,14 @@ function joinYesNo(yesNoValue, desc) {
   const yn = yesNoValue || '';
   if (desc) return yn + (yn?' — ':'') + desc;
   return yn || '—';
+}
+
+function traitBadge(val) {
+  if (!val) return '—';
+  if (val === 'Strongly Agree') return '<span style="color:var(--green);font-weight:600;">💪 ' + esc(val) + '</span>';
+  if (val === 'Agree')          return '<span style="color:var(--blue);font-weight:600;">👍 ' + esc(val) + '</span>';
+  if (val === 'Disagree')       return '<span style="color:var(--red);font-weight:600;">👎 ' + esc(val) + '</span>';
+  return esc(val);
 }
 
 let candidates = [];
@@ -641,18 +666,57 @@ function renderProfile(c) {
       <div class="data-row"><span class="label">College / Other Job</span><span class="value">${esc(c.collegeOrOtherJob||'—')}${c.collegeOrOtherJobDesc?' — '+esc(c.collegeOrOtherJobDesc):''}</span></div>
       <div class="data-row"><span class="label">Open Availability</span><span class="value">${esc(c.openAvailability||'—')}${c.openAvailabilityDesc?' — '+esc(c.openAvailabilityDesc):''}</span></div>
       <div class="data-row"><span class="label">Can Start</span><span class="value">${formatDate(c.startDate)||'—'}</span></div>
-      <div class="data-row"><span class="label">Full-time $36–40k/yr fit</span><span class="value">${esc(c.roleFit||'—')}${c.roleFitDiscussDesc?' — '+esc(c.roleFitDiscussDesc):''}</span></div>
-      ${c.recentJobCompany?`<div class="data-row"><span class="label">Most Recent Company</span><span class="value">${esc(c.recentJobCompany)}</span></div>`:''}
-      ${c.recentJobTitle?`<div class="data-row"><span class="label">Most Recent Title</span><span class="value">${esc(c.recentJobTitle)}</span></div>`:''}
-      ${c.recentJobDayToDay?`<div class="data-row"><span class="label">Day-to-Day</span><span class="value">${esc(c.recentJobDayToDay)}</span></div>`:''}
-      ${c.recentPay?`<div class="data-row"><span class="label">Most Recent Pay</span><span class="value">${esc(c.recentPay)}</span></div>`:''}
-      ${c.whyLeaving?`<div class="data-row"><span class="label">Why Leaving</span><span class="value">${esc(c.whyLeaving)}</span></div>`:''}
-      <div class="data-row"><span class="label">Inventory Exp</span><span class="value">${esc(c.inventoryExp||'—')}${c.inventoryExpDesc?' — '+esc(c.inventoryExpDesc):''}</span></div>
-      <div class="data-row"><span class="label">Scheduling Exp</span><span class="value">${esc(c.schedulingExp||'—')}${c.schedulingExpDesc?' — '+esc(c.schedulingExpDesc):''}</span></div>
-      <div class="data-row"><span class="label">Hire/Fire Exp</span><span class="value">${esc(c.hireFireExp||'—')}${c.hireFireExpDesc?' — '+esc(c.hireFireExpDesc):''}</span></div>
-      <div class="data-row"><span class="label">Training Exp</span><span class="value">${esc(c.trainingExp||'—')}${c.trainingExpDesc?' — '+esc(c.trainingExpDesc):''}</span></div>
-      <div class="data-row"><span class="label">Customer Service Exp</span><span class="value">${esc(c.customerServiceExp||'—')}${c.customerServiceExpDesc?' — '+esc(c.customerServiceExpDesc):''}</span></div>
-      ${c.notes?`<div class="data-row"><span class="label">Notes</span><span class="value">${esc(c.notes)}</span></div>`:''}
+      <div class="data-row"><span class="label">Role / Pay Fit</span><span class="value">${esc(c.roleFit||'—')}${c.roleFitDiscussDesc?' — '+esc(c.roleFitDiscussDesc):''}</span></div>
+
+      ${c.currentlyEmployed?`
+        <div style="margin-top:14px;padding-top:10px;border-top:2px solid var(--border);">
+          <div style="font-size:12px;color:var(--text-soft);font-weight:700;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;">💼 Work History</div>
+          <div class="data-row"><span class="label">Currently employed?</span><span class="value">${esc(c.currentlyEmployed)}</span></div>
+          ${c.currentlyEmployed==='Yes'?`
+            ${c.currentJobCompany?`<div class="data-row"><span class="label">Current Company</span><span class="value">${esc(c.currentJobCompany)}</span></div>`:''}
+            ${c.currentJobDuration?`<div class="data-row"><span class="label">How Long</span><span class="value">${esc(c.currentJobDuration)}</span></div>`:''}
+            ${c.currentJobTitle?`<div class="data-row"><span class="label">Current Title</span><span class="value">${esc(c.currentJobTitle)}</span></div>`:''}
+            ${c.currentJobDayToDay?`<div class="data-row"><span class="label">Day-to-Day</span><span class="value">${esc(c.currentJobDayToDay)}</span></div>`:''}
+            ${c.currentPay?`<div class="data-row"><span class="label">Current Pay</span><span class="value">${esc(c.currentPay)}</span></div>`:''}
+            ${c.whyLookingToLeave?`<div class="data-row"><span class="label">Why Leaving</span><span class="value">${esc(c.whyLookingToLeave)}</span></div>`:''}
+          `:`
+            ${c.recentJobCompany?`<div class="data-row"><span class="label">Most Recent Company</span><span class="value">${esc(c.recentJobCompany)}</span></div>`:''}
+            ${c.recentJobTitle?`<div class="data-row"><span class="label">Most Recent Title</span><span class="value">${esc(c.recentJobTitle)}</span></div>`:''}
+            ${c.recentJobDayToDay?`<div class="data-row"><span class="label">Day-to-Day</span><span class="value">${esc(c.recentJobDayToDay)}</span></div>`:''}
+            ${c.recentPay?`<div class="data-row"><span class="label">Most Recent Pay</span><span class="value">${esc(c.recentPay)}</span></div>`:''}
+            ${c.whyLeftRecentJob?`<div class="data-row"><span class="label">Why Left</span><span class="value">${esc(c.whyLeftRecentJob)}</span></div>`:''}
+          `}
+        </div>
+      `:`
+        ${c.recentJobCompany?`<div class="data-row"><span class="label">Most Recent Company</span><span class="value">${esc(c.recentJobCompany)}</span></div>`:''}
+        ${c.recentJobTitle?`<div class="data-row"><span class="label">Most Recent Title</span><span class="value">${esc(c.recentJobTitle)}</span></div>`:''}
+        ${c.recentJobDayToDay?`<div class="data-row"><span class="label">Day-to-Day</span><span class="value">${esc(c.recentJobDayToDay)}</span></div>`:''}
+        ${c.recentPay?`<div class="data-row"><span class="label">Most Recent Pay</span><span class="value">${esc(c.recentPay)}</span></div>`:''}
+        ${c.whyLeaving?`<div class="data-row"><span class="label">Why Leaving</span><span class="value">${esc(c.whyLeaving)}</span></div>`:''}
+      `}
+
+      <div style="margin-top:14px;padding-top:10px;border-top:2px solid var(--border);">
+        <div style="font-size:12px;color:var(--text-soft);font-weight:700;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;">✅ Specific Experience</div>
+        <div class="data-row"><span class="label">Inventory Exp</span><span class="value">${esc(c.inventoryExp||'—')}${c.inventoryExpDesc?' — '+esc(c.inventoryExpDesc):''}</span></div>
+        <div class="data-row"><span class="label">Scheduling Exp</span><span class="value">${esc(c.schedulingExp||'—')}${c.schedulingExpDesc?' — '+esc(c.schedulingExpDesc):''}</span></div>
+        <div class="data-row"><span class="label">Hire/Fire Exp</span><span class="value">${esc(c.hireFireExp||'—')}${c.hireFireExpDesc?' — '+esc(c.hireFireExpDesc):''}</span></div>
+        <div class="data-row"><span class="label">Training Exp</span><span class="value">${esc(c.trainingExp||'—')}${c.trainingExpDesc?' — '+esc(c.trainingExpDesc):''}</span></div>
+        <div class="data-row"><span class="label">Customer Service Exp</span><span class="value">${esc(c.customerServiceExp||'—')}${c.customerServiceExpDesc?' — '+esc(c.customerServiceExpDesc):''}</span></div>
+      </div>
+
+      ${(c.traitOnTime||c.traitReliable||c.traitAccountable||c.traitAboveBeyond||c.traitRollUpSleeves||c.traitTeamContributor)?`
+        <div style="margin-top:14px;padding-top:10px;border-top:2px solid var(--border);">
+          <div style="font-size:12px;color:var(--text-soft);font-weight:700;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;">⭐ Self-Assessment</div>
+          ${c.traitOnTime?`<div class="data-row"><span class="label">Always on time</span><span class="value">${traitBadge(c.traitOnTime)}</span></div>`:''}
+          ${c.traitReliable?`<div class="data-row"><span class="label">Reliable (no excuses)</span><span class="value">${traitBadge(c.traitReliable)}</span></div>`:''}
+          ${c.traitAccountable?`<div class="data-row"><span class="label">Accountable</span><span class="value">${traitBadge(c.traitAccountable)}</span></div>`:''}
+          ${c.traitAboveBeyond?`<div class="data-row"><span class="label">Goes above &amp; beyond</span><span class="value">${traitBadge(c.traitAboveBeyond)}</span></div>`:''}
+          ${c.traitRollUpSleeves?`<div class="data-row"><span class="label">Rolls up sleeves</span><span class="value">${traitBadge(c.traitRollUpSleeves)}</span></div>`:''}
+          ${c.traitTeamContributor?`<div class="data-row"><span class="label">Team contributor</span><span class="value">${traitBadge(c.traitTeamContributor)}</span></div>`:''}
+        </div>
+      `:''}
+
+      ${c.notes?`<div class="data-row" style="margin-top:14px;padding-top:14px;border-top:2px solid var(--border);"><span class="label">Notes</span><span class="value">${esc(c.notes)}</span></div>`:''}
     </div>
 
     <div class="card" style="padding:16px 24px 24px;">
