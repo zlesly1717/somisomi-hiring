@@ -131,7 +131,7 @@ textarea { resize: vertical; min-height: 70px; }
       <div class="card">
         <div class="card-title"><span class="icon" style="background:var(--yellow-light);color:var(--yellow)">💼</span> Role Fit</div>
         <div class="field">
-          <label>This position is full-time, requires open availability, and is $36,000–$40,000/yr. Is this okay with you? *</label>
+          <label>This position is full-time, requires open availability, and is $36,000–$40,600/yr. Is this okay with you? *</label>
           <div class="radio-group">
             <label><input type="radio" name="roleFit" value="Yes" required> ✅ Yes</label>
             <label><input type="radio" name="roleFit" value="Let's discuss"> 💬 Let's discuss</label>
@@ -145,25 +145,63 @@ textarea { resize: vertical; min-height: 70px; }
 
       <div class="card">
         <div class="card-title"><span class="icon" style="background:var(--yellow-light);color:var(--yellow)">💼</span> Work History</div>
+
         <div class="field">
-          <label>Most recent job company *</label>
-          <input type="text" name="recentJobCompany" required>
+          <label>Are you currently employed? *</label>
+          <div class="radio-group">
+            <label><input type="radio" name="currentlyEmployed" value="Yes" required> Yes</label>
+            <label><input type="radio" name="currentlyEmployed" value="No"> No</label>
+          </div>
         </div>
-        <div class="field" style="margin-top:16px">
-          <label>Most recent job title *</label>
-          <input type="text" name="recentJobTitle" required>
+
+        <div class="reveal" id="reveal-currentlyEmployedYes">
+          <div class="field" style="margin-top:16px">
+            <label>Where are you currently employed? (Company name) *</label>
+            <input type="text" name="currentJobCompany">
+          </div>
+          <div class="field" style="margin-top:16px">
+            <label>How long have you been there? (e.g., "1 year 6 months") *</label>
+            <input type="text" name="currentJobDuration">
+          </div>
+          <div class="field" style="margin-top:16px">
+            <label>Current job title *</label>
+            <input type="text" name="currentJobTitle">
+          </div>
+          <div class="field" style="margin-top:16px">
+            <label>Please describe your day-to-day *</label>
+            <textarea name="currentJobDayToDay"></textarea>
+          </div>
+          <div class="field" style="margin-top:16px">
+            <label>Current pay *</label>
+            <input type="text" name="currentPay">
+          </div>
+          <div class="field" style="margin-top:16px">
+            <label>Why are you looking to leave your job? *</label>
+            <textarea name="whyLookingToLeave"></textarea>
+          </div>
         </div>
-        <div class="field" style="margin-top:16px">
-          <label>Please describe your day-to-day *</label>
-          <textarea name="recentJobDayToDay" required></textarea>
-        </div>
-        <div class="field" style="margin-top:16px">
-          <label>Most recent pay in that job *</label>
-          <input type="text" name="recentPay" required>
-        </div>
-        <div class="field" style="margin-top:16px">
-          <label>Why are you leaving your current (or most recent) role? *</label>
-          <textarea name="whyLeaving" required></textarea>
+
+        <div class="reveal" id="reveal-currentlyEmployedNo">
+          <div class="field" style="margin-top:16px">
+            <label>Most recent job company *</label>
+            <input type="text" name="recentJobCompany">
+          </div>
+          <div class="field" style="margin-top:16px">
+            <label>Most recent job title *</label>
+            <input type="text" name="recentJobTitle">
+          </div>
+          <div class="field" style="margin-top:16px">
+            <label>Please describe your day-to-day at your job *</label>
+            <textarea name="recentJobDayToDay"></textarea>
+          </div>
+          <div class="field" style="margin-top:16px">
+            <label>Most recent pay *</label>
+            <input type="text" name="recentPay">
+          </div>
+          <div class="field" style="margin-top:16px">
+            <label>Why did you leave? *</label>
+            <textarea name="whyLeftRecentJob"></textarea>
+          </div>
         </div>
       </div>
 
@@ -222,6 +260,65 @@ textarea { resize: vertical; min-height: 70px; }
       </div>
 
       <div class="card">
+        <div class="card-title"><span class="icon" style="background:var(--green-light);color:var(--green)">⭐</span> Does this describe you?</div>
+        <p style="font-size:13px;color:var(--text-soft);margin-bottom:16px;">For each statement, pick the option that best describes you.</p>
+
+        <div class="field">
+          <label>Always on time *</label>
+          <div class="radio-group">
+            <label><input type="radio" name="traitOnTime" value="Strongly Agree" required> 💪 Strongly Agree</label>
+            <label><input type="radio" name="traitOnTime" value="Agree"> 👍 Agree</label>
+            <label><input type="radio" name="traitOnTime" value="Disagree"> 👎 Disagree</label>
+          </div>
+        </div>
+
+        <div class="field" style="margin-top:16px">
+          <label>Reliable (no excuses or last-minute changes) *</label>
+          <div class="radio-group">
+            <label><input type="radio" name="traitReliable" value="Strongly Agree" required> 💪 Strongly Agree</label>
+            <label><input type="radio" name="traitReliable" value="Agree"> 👍 Agree</label>
+            <label><input type="radio" name="traitReliable" value="Disagree"> 👎 Disagree</label>
+          </div>
+        </div>
+
+        <div class="field" style="margin-top:16px">
+          <label>Accountable *</label>
+          <div class="radio-group">
+            <label><input type="radio" name="traitAccountable" value="Strongly Agree" required> 💪 Strongly Agree</label>
+            <label><input type="radio" name="traitAccountable" value="Agree"> 👍 Agree</label>
+            <label><input type="radio" name="traitAccountable" value="Disagree"> 👎 Disagree</label>
+          </div>
+        </div>
+
+        <div class="field" style="margin-top:16px">
+          <label>Goes above and beyond *</label>
+          <div class="radio-group">
+            <label><input type="radio" name="traitAboveBeyond" value="Strongly Agree" required> 💪 Strongly Agree</label>
+            <label><input type="radio" name="traitAboveBeyond" value="Agree"> 👍 Agree</label>
+            <label><input type="radio" name="traitAboveBeyond" value="Disagree"> 👎 Disagree</label>
+          </div>
+        </div>
+
+        <div class="field" style="margin-top:16px">
+          <label>Not afraid to roll up sleeves *</label>
+          <div class="radio-group">
+            <label><input type="radio" name="traitRollUpSleeves" value="Strongly Agree" required> 💪 Strongly Agree</label>
+            <label><input type="radio" name="traitRollUpSleeves" value="Agree"> 👍 Agree</label>
+            <label><input type="radio" name="traitRollUpSleeves" value="Disagree"> 👎 Disagree</label>
+          </div>
+        </div>
+
+        <div class="field" style="margin-top:16px">
+          <label>Believe a good manager contributes equally as part of the team *</label>
+          <div class="radio-group">
+            <label><input type="radio" name="traitTeamContributor" value="Strongly Agree" required> 💪 Strongly Agree</label>
+            <label><input type="radio" name="traitTeamContributor" value="Agree"> 👍 Agree</label>
+            <label><input type="radio" name="traitTeamContributor" value="Disagree"> 👎 Disagree</label>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
         <div class="card-title"><span class="icon" style="background:var(--accent-light);color:var(--accent)">📝</span> Anything Else</div>
         <div class="field">
           <label>Anything else you'd like the hiring managers to know? <span class="optional">(optional)</span></label>
@@ -232,7 +329,7 @@ textarea { resize: vertical; min-height: 70px; }
       <div class="card">
         <div class="info-box">
           <strong>🍦 About the role</strong><br><br>
-          Store Manager for our Metropark Square SomiSomi location. Full-time (40 hrs/wk), salaried $36,000–$40,000 depending on experience.<br><br>
+          Store Manager for our Metropark Square SomiSomi location. Full-time (40 hrs/wk), salaried $36,000–$40,600 depending on experience.<br><br>
           You'd be running the whole location — scheduling, inventory, hiring/firing, training, and daily operations.<br><br>
           <strong>Our motto:</strong> Be on time, ready to learn, and work with a positive attitude.
         </div>
@@ -291,6 +388,29 @@ setupReveal('schedulingExp',       ['Yes'],             true);
 setupReveal('hireFireExp',         ['Yes'],             true);
 setupReveal('trainingExp',         ['Yes'],             true);
 setupReveal('customerServiceExp',  ['Yes'],             true);
+
+// Custom Yes/No branching for currentlyEmployed (each branch shows different fields)
+document.querySelectorAll('input[name="currentlyEmployed"]').forEach(r => {
+  r.addEventListener('change', () => {
+    const yesPanel = document.getElementById('reveal-currentlyEmployedYes');
+    const noPanel = document.getElementById('reveal-currentlyEmployedNo');
+    const showYes = r.value === 'Yes' && r.checked;
+    const showNo  = r.value === 'No'  && r.checked;
+    yesPanel.classList.toggle('show', showYes);
+    noPanel.classList.toggle('show', showNo);
+    // Toggle required attribute on each branch's fields
+    const yesFields = yesPanel.querySelectorAll('input, textarea');
+    const noFields  = noPanel.querySelectorAll('input, textarea');
+    yesFields.forEach(f => {
+      if (showYes) f.setAttribute('required','required');
+      else { f.removeAttribute('required'); f.value = ''; }
+    });
+    noFields.forEach(f => {
+      if (showNo) f.setAttribute('required','required');
+      else { f.removeAttribute('required'); f.value = ''; }
+    });
+  });
+});
 
 document.getElementById('apply-form').addEventListener('submit', async (e) => {
   e.preventDefault();
