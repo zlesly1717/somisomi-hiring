@@ -98,6 +98,7 @@ textarea { resize: vertical; min-height: 80px; }
 }
 .sched-shifts label:has(input:checked) { border-color: var(--accent); background: var(--accent-light); color: var(--accent); font-weight: 500; }
 .sched-shifts input { display: none; }
+.sched-required-note { font-size: 12px; color: var(--text-soft); margin-top: 8px; font-style: italic; }
 
 @media (max-width: 600px) { .row-2 { grid-template-columns: 1fr; } .row-3 { grid-template-columns: 1fr 1fr; } }
 @keyframes fadeUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
@@ -183,9 +184,9 @@ textarea { resize: vertical; min-height: 80px; }
             <div class="sched-row">
               <div class="day-label">Monday</div>
               <div class="sched-shifts">
-                <label><input type="radio" name="monShift" value="Either Shift"> ⭐ Either Shift</label>
-                <label><input type="radio" name="monShift" value="12pm–6pm"> 12–6 PM</label>
-                <label><input type="radio" name="monShift" value="6pm–10:30pm"> 6–10:30 PM</label>
+                <label><input type="radio" name="monShift" value="Available all day"> ⭐ Available all day</label>
+                <label><input type="radio" name="monShift" value="12pm–6pm"> Day · 12–6 PM</label>
+                <label><input type="radio" name="monShift" value="6pm–10:30pm"> Evening · 6–10:30 PM</label>
                 <label><input type="radio" name="monShift" value="Unavailable"> Unavailable</label>
               </div>
             </div>
@@ -193,9 +194,9 @@ textarea { resize: vertical; min-height: 80px; }
             <div class="sched-row">
               <div class="day-label">Tuesday</div>
               <div class="sched-shifts">
-                <label><input type="radio" name="tueShift" value="Either Shift"> ⭐ Either Shift</label>
-                <label><input type="radio" name="tueShift" value="12pm–6pm"> 12–6 PM</label>
-                <label><input type="radio" name="tueShift" value="6pm–10:30pm"> 6–10:30 PM</label>
+                <label><input type="radio" name="tueShift" value="Available all day"> ⭐ Available all day</label>
+                <label><input type="radio" name="tueShift" value="12pm–6pm"> Day · 12–6 PM</label>
+                <label><input type="radio" name="tueShift" value="6pm–10:30pm"> Evening · 6–10:30 PM</label>
                 <label><input type="radio" name="tueShift" value="Unavailable"> Unavailable</label>
               </div>
             </div>
@@ -203,9 +204,9 @@ textarea { resize: vertical; min-height: 80px; }
             <div class="sched-row">
               <div class="day-label">Wednesday</div>
               <div class="sched-shifts">
-                <label><input type="radio" name="wedShift" value="Either Shift"> ⭐ Either Shift</label>
-                <label><input type="radio" name="wedShift" value="12pm–6pm"> 12–6 PM</label>
-                <label><input type="radio" name="wedShift" value="6pm–10:30pm"> 6–10:30 PM</label>
+                <label><input type="radio" name="wedShift" value="Available all day"> ⭐ Available all day</label>
+                <label><input type="radio" name="wedShift" value="12pm–6pm"> Day · 12–6 PM</label>
+                <label><input type="radio" name="wedShift" value="6pm–10:30pm"> Evening · 6–10:30 PM</label>
                 <label><input type="radio" name="wedShift" value="Unavailable"> Unavailable</label>
               </div>
             </div>
@@ -213,40 +214,45 @@ textarea { resize: vertical; min-height: 80px; }
             <div class="sched-row">
               <div class="day-label">Thursday</div>
               <div class="sched-shifts">
-                <label><input type="radio" name="thuShift" value="Either Shift"> ⭐ Either Shift</label>
-                <label><input type="radio" name="thuShift" value="12pm–6pm"> 12–6 PM</label>
-                <label><input type="radio" name="thuShift" value="6pm–11:45pm"> 6–11:45 PM</label>
+                <label><input type="radio" name="thuShift" value="Available all day"> ⭐ Available all day</label>
+                <label><input type="radio" name="thuShift" value="12pm–6pm"> Day · 12–6 PM</label>
+                <label><input type="radio" name="thuShift" value="6pm–11:45pm"> Evening · 6–11:45 PM</label>
                 <label><input type="radio" name="thuShift" value="Unavailable"> Unavailable</label>
               </div>
             </div>
 
             <div class="sched-row">
-              <div class="day-label">Friday</div>
+              <div class="day-label">Friday <span style="color:var(--accent);font-weight:600;font-size:12px">· Required</span></div>
               <div class="sched-shifts">
-                <label><input type="radio" name="friShift" value="Either Shift"> ⭐ Either Shift</label>
-                <label><input type="radio" name="friShift" value="12pm–6pm"> 12–6 PM</label>
-                <label><input type="radio" name="friShift" value="6pm–10:30pm"> 6–10:30 PM</label>
-                <label><input type="radio" name="friShift" value="Unavailable"> Unavailable</label>
+                <label><input type="radio" name="friShift" value="Available all day" onchange="handleRequiredDay(this)"> ⭐ Available all day</label>
+                <label><input type="radio" name="friShift" value="12pm–6pm" onchange="handleRequiredDay(this)"> Day · 12–6 PM</label>
+                <label><input type="radio" name="friShift" value="6pm–10:30pm" onchange="handleRequiredDay(this)"> Evening · 6–10:30 PM</label>
+                <label><input type="radio" name="friShift" value="Unavailable" onchange="handleRequiredDay(this)"> Unavailable</label>
+              </div>
+              <div class="warning-box" id="friWarning">
+                ⚠️ <strong>Friday availability is required for this role.</strong> Not being available may affect your eligibility. You may still submit and we will review your application.
               </div>
             </div>
 
             <div class="sched-row">
-              <div class="day-label">Saturday</div>
+              <div class="day-label">Saturday <span style="color:var(--accent);font-weight:600;font-size:12px">· Required</span></div>
               <div class="sched-shifts">
-                <label><input type="radio" name="satShift" value="Either Shift"> ⭐ Either Shift</label>
-                <label><input type="radio" name="satShift" value="11:30am–6pm"> 11:30–6 PM</label>
-                <label><input type="radio" name="satShift" value="6pm–11:30pm"> 6–11:30 PM</label>
-                <label><input type="radio" name="satShift" value="Unavailable"> Unavailable</label>
+                <label><input type="radio" name="satShift" value="Available all day" onchange="handleRequiredDay(this)"> ⭐ Available all day</label>
+                <label><input type="radio" name="satShift" value="Unavailable all day" onchange="handleRequiredDay(this)"> Unavailable all day</label>
+              </div>
+              <div class="warning-box" id="satWarning">
+                ⚠️ <strong>Sorry — full Saturday availability is a required part of this role.</strong> Not being available all day Saturday may affect your eligibility. You may still submit your application and we will review it.
               </div>
             </div>
 
             <div class="sched-row">
-              <div class="day-label">Sunday</div>
+              <div class="day-label">Sunday <span style="color:var(--accent);font-weight:600;font-size:12px">· Required</span></div>
               <div class="sched-shifts">
-                <label><input type="radio" name="sunShift" value="Either Shift"> ⭐ Either Shift</label>
-                <label><input type="radio" name="sunShift" value="11:30am–6pm"> 11:30–6 PM</label>
-                <label><input type="radio" name="sunShift" value="6pm–11:45pm"> 6–11:45 PM</label>
-                <label><input type="radio" name="sunShift" value="Unavailable"> Unavailable</label>
+                <label><input type="radio" name="sunShift" value="Available all day" onchange="handleRequiredDay(this)"> ⭐ Available all day</label>
+                <label><input type="radio" name="sunShift" value="Unavailable all day" onchange="handleRequiredDay(this)"> Unavailable all day</label>
+              </div>
+              <div class="warning-box" id="sunWarning">
+                ⚠️ <strong>Sorry — full Sunday availability is a required part of this role.</strong> Not being available all day Sunday may affect your eligibility. You may still submit your application and we will review it.
               </div>
             </div>
 
@@ -472,6 +478,15 @@ function handleOtherJob(r) {
 
 function handleMachineCleaning(r) {
   document.getElementById('machineCleaningWarning').style.display = r.value === 'Neither' ? 'block' : 'none';
+}
+
+function handleRequiredDay(r) {
+  const map = { friShift: 'friWarning', satShift: 'satWarning', sunShift: 'sunWarning' };
+  const warnId = map[r.name];
+  if (warnId) {
+    const isUnavailable = r.value === 'Unavailable' || r.value === 'Unavailable all day';
+    document.getElementById(warnId).style.display = isUnavailable ? 'block' : 'none';
+  }
 }
 
 function handleStartNow(r) {
