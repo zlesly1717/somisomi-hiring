@@ -176,9 +176,6 @@ textarea { resize: vertical; min-height: 80px; }
         <!-- SCHEDULE -->
         <div class="field" style="margin-top:16px">
           <label>Available Days &amp; Shifts *</label>
-          <div class="notice-box">
-            <strong>Open availability is highly preferred and can impact our decision to move forward.</strong> Please select every shift you are available for.
-          </div>
           <div class="schedule-grid">
 
             <div class="sched-row">
@@ -222,37 +219,43 @@ textarea { resize: vertical; min-height: 80px; }
             </div>
 
             <div class="sched-row">
-              <div class="day-label">Friday <span style="color:var(--accent);font-weight:600;font-size:12px">· Required</span></div>
+              <div class="day-label">Friday</div>
               <div class="sched-shifts">
-                <label><input type="radio" name="friShift" value="Available all day" required onchange="handleRequiredDay(this)"> Available all day</label>
+                <label><input type="radio" name="friShift" value="Available all day" onchange="handleRequiredDay(this)"> Available all day</label>
                 <label><input type="radio" name="friShift" value="12pm–6pm" onchange="handleRequiredDay(this)"> Day · 12–6 PM</label>
-                <label><input type="radio" name="friShift" value="6pm–10:30pm" onchange="handleRequiredDay(this)"> Evening · 6–10:30 PM</label>
+                <label><input type="radio" name="friShift" value="6pm–10:30pm" required checked onchange="handleRequiredDay(this)"> Evening · 6–10:30 PM <span style="color:var(--accent);font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:0.5px;margin-left:4px;">Required</span></label>
                 <label><input type="radio" name="friShift" value="Unavailable all day" onchange="handleRequiredDay(this)"> Unavailable all day</label>
               </div>
               <div class="warning-box" id="friWarning">
-                ⚠️ <strong>Friday availability is required for this role.</strong> Not being available may affect your eligibility. You may still submit and we will review your application.
+                ⚠️ <strong>Friday evening availability is a required part of this role.</strong> Not being available may affect your eligibility. You may still submit and we will review your application.
               </div>
             </div>
 
             <div class="sched-row">
-              <div class="day-label">Saturday <span style="color:var(--accent);font-weight:600;font-size:12px">· Required</span></div>
-              <div class="sched-shifts">
-                <label><input type="checkbox" name="satDay" value="11:30am–6pm" checked onchange="handleShiftCheck('sat')"> Day · 11:30 AM–6 PM</label>
-                <label><input type="checkbox" name="satEve" value="6pm–11:30pm" checked onchange="handleShiftCheck('sat')"> Evening · 6–11:30 PM</label>
+              <div class="day-label">Saturday</div>
+              <div class="sched-shifts" style="flex-direction:column; align-items:flex-start; gap:8px;">
+                <div style="font-size:11px; font-weight:700; color:var(--accent); text-transform:uppercase; letter-spacing:0.5px;">Required — both shifts</div>
+                <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                  <label style="opacity:0.85;cursor:not-allowed;"><input type="checkbox" name="satDay" value="11:30am–6pm" checked disabled> Day · 11:30 AM–6 PM</label>
+                  <label style="opacity:0.85;cursor:not-allowed;"><input type="checkbox" name="satEve" value="6pm–11:30pm" checked disabled> Evening · 6–11:30 PM</label>
+                </div>
+                <label><input type="checkbox" name="satUnavail" value="Not available all day" onchange="handleLockedDay('sat')"> Not available all day</label>
               </div>
-              <div class="sched-required-note">Both shifts are pre-selected because full Saturday availability is expected. Uncheck only if you truly can't work that shift, but keep in mind it may impact moving forward with you.</div>
               <div class="warning-box" id="satWarning">
                 ⚠️ <strong>Sorry — full Saturday availability is a required part of this role.</strong> Not being available all day Saturday may affect your eligibility. You may still submit your application and we will review it.
               </div>
             </div>
 
             <div class="sched-row">
-              <div class="day-label">Sunday <span style="color:var(--accent);font-weight:600;font-size:12px">· Required</span></div>
-              <div class="sched-shifts">
-                <label><input type="checkbox" name="sunDay" value="11:30am–6pm" checked onchange="handleShiftCheck('sun')"> Day · 11:30 AM–6 PM</label>
-                <label><input type="checkbox" name="sunEve" value="6pm–11:45pm" checked onchange="handleShiftCheck('sun')"> Evening · 6–11:45 PM</label>
+              <div class="day-label">Sunday</div>
+              <div class="sched-shifts" style="flex-direction:column; align-items:flex-start; gap:8px;">
+                <div style="font-size:11px; font-weight:700; color:var(--accent); text-transform:uppercase; letter-spacing:0.5px;">Required — both shifts</div>
+                <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                  <label style="opacity:0.85;cursor:not-allowed;"><input type="checkbox" name="sunDay" value="11:30am–6pm" checked disabled> Day · 11:30 AM–6 PM</label>
+                  <label style="opacity:0.85;cursor:not-allowed;"><input type="checkbox" name="sunEve" value="6pm–11:45pm" checked disabled> Evening · 6–11:45 PM</label>
+                </div>
+                <label><input type="checkbox" name="sunUnavail" value="Not available all day" onchange="handleLockedDay('sun')"> Not available all day</label>
               </div>
-              <div class="sched-required-note">Both shifts are pre-selected because full Sunday availability is expected. Uncheck only if you truly can't work that shift, but keep in mind it may impact moving forward with you.</div>
               <div class="warning-box" id="sunWarning">
                 ⚠️ <strong>Sorry — full Sunday availability is a required part of this role.</strong> Not being available all day Sunday may affect your eligibility. You may still submit your application and we will review it.
               </div>
@@ -483,19 +486,16 @@ function handleMachineCleaning(r) {
 }
 
 function handleRequiredDay(r) {
-  const map = { friShift: 'friWarning', satShift: 'satWarning', sunShift: 'sunWarning' };
-  const warnId = map[r.name];
-  if (warnId) {
-    const isUnavailable = r.value === 'Unavailable' || r.value === 'Unavailable all day';
-    document.getElementById(warnId).style.display = isUnavailable ? 'block' : 'none';
+  if (r.name === 'friShift') {
+    const isUnavailable = r.value === 'Unavailable all day';
+    document.getElementById('friWarning').style.display = isUnavailable ? 'block' : 'none';
   }
 }
 
-function handleShiftCheck(prefix) {
-  const day = document.querySelector(`input[name="${prefix}Day"]`);
-  const eve = document.querySelector(`input[name="${prefix}Eve"]`);
+function handleLockedDay(prefix) {
+  const unavail = document.querySelector(`input[name="${prefix}Unavail"]`);
   const warn = document.getElementById(prefix + 'Warning');
-  warn.style.display = (!day.checked && !eve.checked) ? 'block' : 'none';
+  warn.style.display = unavail.checked ? 'block' : 'none';
 }
 
 function handleStartNow(r) {
@@ -525,16 +525,11 @@ function getScheduleData() {
     else results.push(labels[d] + ': No answer');
   });
   ['sat','sun'].forEach(d => {
-    const day = document.querySelector(`input[name="${d}Day"]`);
-    const eve = document.querySelector(`input[name="${d}Eve"]`);
-    if (day.checked && eve.checked) {
-      results.push(labels[d] + ': Available all day');
-    } else if (day.checked) {
-      results.push(labels[d] + ': ' + day.value);
-    } else if (eve.checked) {
-      results.push(labels[d] + ': ' + eve.value);
+    const unavail = document.querySelector(`input[name="${d}Unavail"]`);
+    if (unavail && unavail.checked) {
+      results.push(labels[d] + ': Not available all day');
     } else {
-      results.push(labels[d] + ': Unavailable all day');
+      results.push(labels[d] + ': Available all day');
     }
   });
   return results.join(' | ');
@@ -548,18 +543,6 @@ document.getElementById('apply-form').addEventListener('submit', async (e) => {
   if (!form.checkValidity()) {
     form.reportValidity();
     return;
-  }
-
-  // Saturday/Sunday: at least one shift must be checked
-  for (const d of ['sat','sun']) {
-    const day = document.querySelector(`input[name="${d}Day"]`).checked;
-    const eve = document.querySelector(`input[name="${d}Eve"]`).checked;
-    if (!day && !eve) {
-      const label = d === 'sat' ? 'Saturday' : 'Sunday';
-      showToast(`Please select your ${label} availability before submitting.`);
-      document.getElementById(d + 'Warning').scrollIntoView({behavior:'smooth', block:'center'});
-      return;
-    }
   }
 
   const btn = document.getElementById('apply-btn');
