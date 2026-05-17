@@ -658,22 +658,39 @@ function renderProfile(c) {
     </div>
     <div class="card">
       <div class="card-title"><span class="icon" style="background:var(--yellow-light);color:var(--yellow)">💼</span> Experience</div>
-      ${c.currentlyEmployed ? `<div class="data-row"><span class="label">Currently Employed</span><span class="value">${esc(c.currentlyEmployed)}</span></div>` : ''}
-      ${c.currentlyEmployed === 'Yes' ? `
-        <div class="data-row"><span class="label">Company</span><span class="value">${esc(c.currentCompany||'—')}</span></div>
-        <div class="data-row"><span class="label">Job Title</span><span class="value">${esc(c.currentTitle||'—')}</span></div>
-        <div class="data-row"><span class="label">How Long</span><span class="value">${esc(c.currentLength||'—')}</span></div>
-        <div class="data-row"><span class="label">Reason Leaving</span><span class="value">${esc(c.currentReason||'—')}</span></div>
-      ` : c.currentlyEmployed === 'No' ? `
-        <div class="data-row"><span class="label">Most Recent Company</span><span class="value">${esc(c.recentCompany||'—')}</span></div>
-        <div class="data-row"><span class="label">Job Title</span><span class="value">${esc(c.recentTitle||'—')}</span></div>
-        <div class="data-row"><span class="label">How Long Ago</span><span class="value">${esc(c.recentWhen||'—')}</span></div>
-        <div class="data-row"><span class="label">How Long There</span><span class="value">${esc(c.recentLength||'—')}</span></div>
-        <div class="data-row"><span class="label">Reason Left</span><span class="value">${esc(c.recentReason||'—')}</span></div>
-      ` : `
-        <div class="data-row"><span class="label">Recent Job</span><span class="value">${esc(c.recentJob||'—')}</span></div>
-        ${c.recentJob ? `<div class="data-row"><span class="label">Duration</span><span class="value">${esc(c.recentJobLength||'—')}</span></div><div class="data-row"><span class="label">Reason Left</span><span class="value">${esc(c.recentJobReason||'—')}</span></div>` : ''}
-      `}
+      ${(() => {
+        const ce = (c.currentlyEmployed || '').toLowerCase();
+        const isCurrent = ce === 'yes' || ce === 'currently employed';
+        const isPrevious = ce === 'no' || ce === 'previously employed (not working now)';
+        const isFirstJob = ce === 'this would be my first job';
+        let body = '';
+        if (isCurrent) {
+          body = `
+            <div class="data-row"><span class="label">Company</span><span class="value">${esc(c.currentCompany||'—')}</span></div>
+            <div class="data-row"><span class="label">Job Title</span><span class="value">${esc(c.currentTitle||'—')}</span></div>
+            <div class="data-row"><span class="label">How Long</span><span class="value">${esc(c.currentLength||'—')}</span></div>
+            <div class="data-row"><span class="label">Reason Leaving</span><span class="value">${esc(c.currentReason||'—')}</span></div>`;
+        } else if (isPrevious) {
+          if (c.recentCompany || c.recentTitle || c.recentWhen || c.recentReason) {
+            body = `
+              <div class="data-row"><span class="label">Most Recent Company</span><span class="value">${esc(c.recentCompany||'—')}</span></div>
+              <div class="data-row"><span class="label">Job Title</span><span class="value">${esc(c.recentTitle||'—')}</span></div>
+              <div class="data-row"><span class="label">How Long Ago</span><span class="value">${esc(c.recentWhen||'—')}</span></div>
+              <div class="data-row"><span class="label">How Long There</span><span class="value">${esc(c.recentLength||'—')}</span></div>
+              <div class="data-row"><span class="label">Reason Left</span><span class="value">${esc(c.recentReason||'—')}</span></div>`;
+          } else {
+            body = `
+              <div class="data-row"><span class="label">Recent Job</span><span class="value">${esc(c.recentJob||'—')}</span></div>
+              ${c.recentJob ? `<div class="data-row"><span class="label">Duration</span><span class="value">${esc(c.recentJobLength||'—')}</span></div><div class="data-row"><span class="label">Reason Left</span><span class="value">${esc(c.recentJobReason||'—')}</span></div>` : ''}`;
+          }
+        } else if (isFirstJob) {
+          body = `<div class="data-row"><span class="label">Work History</span><span class="value">This would be their first job</span></div>`;
+        } else {
+          body = `<div class="data-row"><span class="label">Recent Job</span><span class="value">${esc(c.recentJob||c.recentCompany||'—')}</span></div>`;
+        }
+        const labelRow = c.currentlyEmployed ? `<div class="data-row"><span class="label">Work Experience</span><span class="value">${esc(c.currentlyEmployed)}</span></div>` : '';
+        return labelRow + body;
+      })()}
       <div class="data-row"><span class="label">Food Industry Exp</span><span class="value">${esc(c.foodExp||c.foodJob||'—')}</span></div>
     </div>
     <div class="card">
