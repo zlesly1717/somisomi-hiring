@@ -645,7 +645,7 @@ function renderProfile(c) {
     </div>`:''}
     <div class="card">
       <div class="card-title"><span class="icon" style="background:var(--blue-light);color:var(--blue)">📅</span> Availability & Reliability</div>
-      <div class="data-row"><span class="label">Student</span><span class="value">${esc(c.student||'—')}</span></div>
+      <div class="data-row"><span class="label">Student</span><span class="value">${esc(c.student||'—')}${c.gradYear?' — Grad '+esc(c.gradYear):''}</span></div>
       <div class="data-row"><span class="label">Other Job</span><span class="value">${esc(c.otherJob||'—')}${c.otherJobDesc?' — '+esc(c.otherJobDesc):''}</span></div>
       <div class="data-row"><span class="label">Available Days</span><span class="value">${esc(c.days||'—')}</span></div>
       <div class="data-row"><span class="label">Machine Cleaning</span><span class="value">${esc(c.machineCleaning||'—')}</span></div>
