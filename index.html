@@ -99,6 +99,8 @@ textarea { resize: vertical; min-height: 80px; }
 .sched-shifts label:has(input:checked) { border-color: var(--accent); background: var(--accent-light); color: var(--accent); font-weight: 500; }
 .sched-shifts input { display: none; }
 .sched-required-note { font-size: 12px; color: var(--text-soft); margin-top: 8px; font-style: italic; }
+.field-error { outline: 2px solid var(--red); outline-offset: 4px; border-radius: 8px; animation: errPulse 0.4s ease; }
+@keyframes errPulse { 0% { outline-color: transparent; } 100% { outline-color: var(--red); } }
 
 @media (max-width: 600px) { .row-2 { grid-template-columns: 1fr; } .row-3 { grid-template-columns: 1fr 1fr; } }
 @keyframes fadeUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
@@ -539,9 +541,52 @@ document.getElementById('apply-form').addEventListener('submit', async (e) => {
   e.preventDefault();
   const form = e.target;
 
-  // Native required-field validation (shows browser prompts on blank fields)
-  if (!form.checkValidity()) {
-    form.reportValidity();
+  // Clear any previous error highlights
+  document.querySelectorAll('.field-error').forEach(el => el.classList.remove('field-error'));
+
+  // Friendly labels for the schedule days (hidden radios — native prompt won't show)
+  const dayLabels = {
+    monShift: 'Monday', tueShift: 'Tuesday', wedShift: 'Wednesday',
+    thuShift: 'Thursday', friShift: 'Friday'
+  };
+
+  // Find the first required field that's missing
+  const requiredEls = form.querySelectorAll('[required]');
+  const checkedNames = new Set();
+  let firstMissing = null;
+  let missingLabel = '';
+
+  for (const el of requiredEls) {
+    if (el.disabled) continue;
+    if (el.type === 'radio' || el.type === 'checkbox') {
+      if (checkedNames.has(el.name)) continue;
+      const anyChecked = form.querySelector(`input[name="${el.name}"]:checked`);
+      checkedNames.add(el.name);
+      if (!anyChecked) {
+        firstMissing = el;
+        if (dayLabels[el.name]) {
+          missingLabel = `Please select your availability for ${dayLabels[el.name]}.`;
+        } else {
+          const lbl = el.closest('.field')?.querySelector('label');
+          missingLabel = lbl ? `Please complete: ${lbl.textContent.replace('*','').trim()}` : 'Please complete all required fields.';
+        }
+        break;
+      }
+    } else if (!el.value.trim()) {
+      firstMissing = el;
+      const lbl = el.closest('.field')?.querySelector('label');
+      missingLabel = lbl ? `Please complete: ${lbl.textContent.replace('*','').trim()}` : 'Please complete all required fields.';
+      break;
+    }
+  }
+
+  if (firstMissing) {
+    const card = firstMissing.closest('.field') || firstMissing.closest('.card');
+    if (card) {
+      card.classList.add('field-error');
+      card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+    showToast(missingLabel);
     return;
   }
 
